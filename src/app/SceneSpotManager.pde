@@ -29,7 +29,7 @@ void draw() {
     String str = spot.readStringUntil('\n');
     str = str.trim();
     String data[] = str.split(",");
-
+    if (data.length < 3) return;
     switch (int(data[0])) {
     case 3:
       colorMode(HSB);
