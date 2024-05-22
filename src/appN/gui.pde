@@ -43,6 +43,9 @@ void guiSetup() {
     .setColorActive(color(#ff0000));
   ;
 
+  addColors();
+
+
   //cp5
   //  .addToggle("smoothing")
   //  .setCaptionLabel("smoothing")
@@ -72,6 +75,38 @@ void guiSetup() {
     .setColorActive(color(#ffff00));
 
   cp5
+    .addButton("br_off")
+    .setCaptionLabel("off")
+    .setPosition(10, 320)
+    .setSize(50, 30)
+    ;
+
+  cp5
+    .addButton("br_on")
+    .setCaptionLabel("on")
+    .setPosition(100, 320)
+    .setSize(50, 30)
+    ;
+
+  cp5
+    .addSlider("br_speed")
+    .setCaptionLabel("speed")
+    .setPosition(10, 370)
+    .setSize(140, 30)
+    .setRange(0, 200)
+    .setValue(20);
+    ;
+
+  cp5
+    .addSlider("br_maxBr")
+    .setCaptionLabel("Max Brightness")
+    .setPosition(10, 420)
+    .setSize(140, 30)
+    .setRange(0, 255)
+    .setValue(255);
+  ;
+
+  cp5
     .addColorWheel("picker", 480, 10, 500)
     .setCaptionLabel("")
     ;
@@ -79,7 +114,7 @@ void guiSetup() {
   cp5
     .addSlider("temp")
     .setCaptionLabel("temperature")
-    .setPosition(180, 50)
+    .setPosition(250, 10)
     .setSize(40, 350)
     .setRange(20, 50)
     .lock()
@@ -88,21 +123,70 @@ void guiSetup() {
   cp5
     .addSlider("fan")
     .setCaptionLabel("fan")
-    .setPosition(320, 50)
+    .setPosition(400, 10)
     .setSize(40, 350)
     .setRange(0, 255)
     .lock()
     ;
+    
+     cp5
+    .addToggle("splash")
+    .setCaptionLabel("splash")
+    .setValue(!false)
+    .setMode(ControlP5.SWITCH)
+    .setPosition(10, 470)
+    .setSize(80, 30)
+    .setColorActive(color(#ff0000));
+  ;
+    
+    cp5
+    .addSlider("sp_speed")
+    .setCaptionLabel("speed")
+    .setPosition(100, 470)
+    .setSize(300, 30)
+    .setRange(0, 500)
+    .setValue(200);
+  ;
+  
+       cp5
+    .addToggle("shift")
+    .setCaptionLabel("shift")
+    .setValue(!false)
+    .setMode(ControlP5.SWITCH)
+    .setPosition(10, 520)
+    .setSize(80, 30)
+    .setColorActive(color(#ff0000));
+  ;
+    
+    cp5
+    .addSlider("sh_speed")
+    .setCaptionLabel("speed")
+    .setPosition(100, 520)
+    .setSize(300, 30)
+    .setRange(0, 500)
+    .setValue(200);
+  ;
+  
+  
+    cp5
+    .addToggle("wheel")
+    .setCaptionLabel("wheel")
+    .setValue(!false)
+    .setMode(ControlP5.SWITCH)
+    .setPosition(10, 570)
+    .setSize(80, 30)
+    .setColorActive(color(#ff0000));
+  ;
+    
+    cp5
+    .addSlider("wl_speed")
+    .setCaptionLabel("speed")
+    .setPosition(100, 570)
+    .setSize(300, 30)
+    .setRange(0, 500)
+    .setValue(200);
+  ;
 }
-
-void bright(int val) {
-  cp5.get(Knob.class, "bright").setColorForeground(color(val, val, 0)).setColorActive(color(val, val, 0));
-  if (cp5.get(Toggle.class, "switch_b").getValue() != 0) return;
-  String str = "1," + str(int(val)) + ';';
-  println(str);
-  if (spot != null) spot.write(str);
-}
-
 
 void switch_b(int val) {
   String str = "1,";
@@ -120,18 +204,30 @@ void switch_b(int val) {
 }
 
 
-void picker(int col) {
-  String str = "2,";
-  str += int(red(col));
-  str += ',';
-  str += int(green(col));
-  str += ',';
-  str += int(blue(col));
-  str += ';';
-  println(str);
 
-  if (spot != null) spot.write(str);
-}
+
+
+//void R(int val) {
+//  color col = color(val, int(cp5.get(Slider.class, "G").getValue()), int(cp5.get(Slider.class, "B").getValue()));
+//  println("R!!!!!");
+// // updateColorPicker(col);
+//  updateColorSpot(col);
+//}
+
+//void G(int val) {
+//  color col = color (int(cp5.get(Slider.class, "R").getValue()), val, int(cp5.get(Slider.class, "B").getValue()));
+
+//  //updateColorPicker(col);
+//  updateColorSpot(col);
+//}
+
+//void B(int val) {
+//  color col = color(int(cp5.get(Slider.class, "R").getValue()), int(cp5.get(Slider.class, "G").getValue()), val);
+
+// //updateColorPicker(col);
+//  updateColorSpot(col);
+//}
+
 
 //void smoothing(int value) {
 //  int x = int(cp5.get(Knob.class, "bright").getValue());

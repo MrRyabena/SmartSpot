@@ -31,6 +31,8 @@ void setup() {
 
 void draw() {
   background(guiColors[0]);
+  thread("br_tick");
+  thread("ef_tick");
   fill(255);
   if (spot != null && spot.available() > 0) {
     if (spot.available() < 7) return; 
