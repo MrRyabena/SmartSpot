@@ -1,5 +1,12 @@
 #pragma once
 
+
+inline constexpr auto SERVER_IP = "192.168.1.10";
+inline constexpr auto PORT = 10002;
+
+inline constexpr auto WiFiSSID = "SHS_WiFi_2";
+inline constexpr auto WiFiPASS = "28841971";
+
 /*
  TX -- green
  RX -- yellow
