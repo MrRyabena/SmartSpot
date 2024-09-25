@@ -71,22 +71,27 @@ void loop()
 
 void dtp_handler(shs::ByteCollectorReadIterator<> &it)
 {
+  for (auto i = 0; i < it.size(); i++) { Serial.print(it[i]); Serial.print(" "); }
   uint8_t value{};
+  it.get(value);
+  Serial.print("Size: "); Serial.println(value);
   Serial.print("Command:  ");
   it.get(value);
   Serial.println(value);
 
 if (value == 1) {
-Serial.print("Value:  ");
+  Serial.print("Value:  ");
   it.get(value);
   Serial.println(value);
+  Serial.println(it.size());
+  
 }
 
 else
 {
   
   Serial.print("Value:  ");
-  for (uint8_t i = 0; i < 3; i++) Serial.print(*it); ++it; Serial.print("  ");
+  for (uint8_t i = 0; i < 3; i++) {Serial.print(*it); ++it; Serial.print("  ");}
 }
 
 Serial.println('\n');
