@@ -1,20 +1,29 @@
 #include "settings.h"
 
-#include <shs_FastDTP.h>
+
+#include <shs_DTP.h>
+#include <shsL_GRGB_API.h>
+#include <shs_APIprint.h>
 #include <shs_ControlWiFi.h>
 #include <shs_ByteCollector.h>
 #include <shs_ByteCollectorIterator.h>
 
+#include <shs_ControlWiFi.h>
+
 #include <ESP8266WiFi.h>
+#include <shs_TcpClient.h>
 
 
 void dtp_handler(shs::ByteCollectorReadIterator<> &it);
 
-// #include <GRGB.h>
-// GRGB chip(COMMON_CATHODE, Rp, Gp, Bp);
+#include <GRGB.h>
+GRGB chip(COMMON_CATHODE, Rp, Gp, Bp);
 
-WiFiClient client;
-shs::FastDTP dtp(client, dtp_handler, 10);
+shs::TcpClient client(SERVER_IP, PORT, 5);
+
+shs::GRGB_API grgb_api(chip, THIS_ID);
+shs::APIprint apip(THIS_ID);
+shs::DTP dtp(client, apip, THIS_ID);
 
 
 // get temperature from the thermister
@@ -23,21 +32,24 @@ shs::FastDTP dtp(client, dtp_handler, 10);
 // control temperature and manage fan's power
 //void temperatureControl();
 
-void setup()
-{
-   Serial.begin(115200);
+void setup() {
+  Serial.begin(115200);
 
-   Serial.println();
-  WiFi.begin(WiFiSSID, WiFiPASS);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print('.');
-    if (millis() >= 30000) ESP.restart();
-  }
+  //  Serial.println();
+  //  WiFi.begin(WiFiSSID, WiFiPASS);
+  //  while (WiFi.status() != WL_CONNECTED) {
+  //   delay(500);
+  //   Serial.print('.');
+  //   if (millis() >= 30000) ESP.restart();
+  // }
+  shs::ControlWiFi::connectWiFiWait();
+  Serial.println();
+  Serial.print("WiFi status: ");
+  Serial.println(shs::ControlWiFi::WiFiConnected());
 
 
   //shs::ControlWiFi::connectWiFi(WiFiSSID, WiFiPASS);
- 
+
   // pinMode(fan_p, OUTPUT);
 
   // pinMode(therm_p, INPUT);
@@ -51,15 +63,14 @@ void setup()
   Serial.println(client.connect(SERVER_IP, PORT));
   Serial.println(client.connected());
 
-   if (client.connected()) client.write("Hello");
-
+  client.start();
 }
 
-void loop()
-{
+void loop() {
   //temperatureControl();
+
+  if (client.connected()) dtp.tick();
  
-  if (client.connected())  dtp.tick();
 
   // static uint32_t tmr{};
   // if (millis() - tmr >= 200) {
@@ -69,36 +80,38 @@ void loop()
   // }
 }
 
-void dtp_handler(shs::ByteCollectorReadIterator<> &it)
-{
-  for (auto i = 0; i < it.size(); i++) { Serial.print(it[i]); Serial.print(" "); }
+void dtp_handler(shs::ByteCollectorReadIterator<> &it) {
+  for (auto i = 0; i < it.size(); i++) {
+    Serial.print(it[i]);
+    Serial.print(" ");
+  }
   uint8_t value{};
   it.get(value);
-  Serial.print("Size: "); Serial.println(value);
+  Serial.print("Size: ");
+  Serial.println(value);
   Serial.print("Command:  ");
   it.get(value);
   Serial.println(value);
 
-if (value == 1) {
-  Serial.print("Value:  ");
-  it.get(value);
-  Serial.println(value);
-  Serial.println(it.size());
-  
-}
+  if (value == 1) {
+    Serial.print("Value:  ");
+    it.get(value);
+    Serial.println(value);
+    Serial.println(it.size());
 
-else
-{
-  
-  Serial.print("Value:  ");
-  for (uint8_t i = 0; i < 3; i++) {Serial.print(*it); ++it; Serial.print("  ");}
-}
+  }
 
-Serial.println('\n');
-  
+  else {
 
-  
+    Serial.print("Value:  ");
+    for (uint8_t i = 0; i < 3; i++) {
+      Serial.print(*it);
+      ++it;
+      Serial.print("  ");
+    }
+  }
 
+  Serial.println('\n');
 }
 
 
@@ -143,9 +156,8 @@ Serial.println('\n');
 //     str += temp;
 //     str += ',';
 //     str += fanPower;
-        
+
 //     Serial.println(str);
 //     tmr = millis();
 //   }
 // }
-

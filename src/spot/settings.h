@@ -7,18 +7,17 @@ inline constexpr auto PORT = 10002;
 inline constexpr auto WiFiSSID = "SHS_WiFi_2";
 inline constexpr auto WiFiPASS = "28841971";
 
+inline constexpr auto THIS_ID = 10;
+
 /*
  TX -- green
  RX -- yellow
 */
 
 // RGB:
-#define Rp 10
-#define Gp 9
-#define Bp 3
-
-#define frequency_9_10 31       // 62.5 kHz (62); 31.4 kHz (31); 7.8 kHz (8); 4 kHz (4); 976 Hz (1); no changes (490 Hz) (0)
-#define frequency_3_11 31
+#define Rp 13
+#define Gp 12
+#define Bp 14
 
 
 #define fan_p 11
