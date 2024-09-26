@@ -61,17 +61,25 @@ void setup() {
   spg1.guiSetup();
   spg2.guiSetup();
   
-  while (spotL == null) {
-  spotL = server.available();
-  }
-  sv1.spot = spotL;
-  println(spotL.ip());
 }
 
 void sync(int val)
 {
  spg1.syncing_flag = !boolean(val); 
- print(!boolean(val));
+ println(!boolean(val));
+}
+
+void checkConnection()
+{
+  if (spotL != null && !spotL.active()) { spotL.stop(); spotL = null; }
+  if (spotL == null) {
+  Client cl = server.available();
+  if (cl != null) {
+    spotL = cl;
+    sv1.spot = spotL;
+    println(spotL.ip());
+  }
+  }
 }
 
 // ========================================================================================
@@ -79,6 +87,7 @@ void sync(int val)
 void draw() {
    
   background(guiColors[0]);
+  checkConnection();
   spg1.tick();
   spg2.tick();
 

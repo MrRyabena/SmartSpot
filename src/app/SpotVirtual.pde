@@ -21,7 +21,8 @@ class SpotVirtual
         buf[2] |= val;
         buf[3] = '\n';
         
-        println(buf[2]);
+        println(spot == null);
+        println(spotL == null);
 
         if (spot != null) spot.write(buf);
     }
