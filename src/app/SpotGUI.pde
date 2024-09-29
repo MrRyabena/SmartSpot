@@ -77,12 +77,15 @@ void setBright(int val)
 }
 
 void updateBrightSpot(int val) {
-  if (cp5.get(Toggle.class, pannel_name + "switch_b").getValue() != 0) return;
+  
+  int out =  int(cp5.get(Slider.class, pannel_name + "br_maxBr").getValue());
+  if (val <= out) out = val;
+  
+ 
+  if (int(cp5.get(Toggle.class, pannel_name + "switch_b").getValue()) == 0) out = 0;
 
-  int max =  int(cp5.get(Slider.class, pannel_name + "br_maxBr").getValue());
-  if (val > max) val = max;
-
-  if (spot_virtual != null) spot_virtual.setBright(val);
+  
+  if (spot_virtual != null) spot_virtual.setBright(out);
 }
 
 void updateBrightMaxBr(int val) {
@@ -92,7 +95,6 @@ void updateBrightMaxBr(int val) {
 void handleBright(CallbackEvent event) {
     
     int val = int(event.getController().getValue());
-    println(val);
     if (syncing_flag) for (SpotGUI x : syncing) x.setBright(val);
     updateBrightSpot(val);
 }
@@ -125,7 +127,7 @@ void handle_switch_b(CallbackEvent event) {
   int set_val = 0;
   int val = int(event.getController().getValue());
 
-  if (val == 0) {
+  if (val == 1) {
     set_val = int(cp5.get(Knob.class, pannel_name + "bright").getValue());
     cp5.get(Toggle.class, pannel_name + "switch_b").setColorActive(color(#00ff00));
   } else {
@@ -167,7 +169,7 @@ void ef_splash() {
 
 void handle_ef_splash_toggle(CallbackEvent event) {
    int val = int(event.getController().getValue());
-  if (val == 0) {
+  if (val == 1) {
     cp5.get(Toggle.class, pannel_name + "splash").setColorActive(color(#00ff00));
     flag_sp = true;
   } else {
@@ -194,7 +196,7 @@ void ef_shift() {
 
 void handle_ef_shift_toggle(CallbackEvent event) {
     int val = int(event.getController().getValue());
-  if (val == 0) {
+  if (val == 1) {
     cp5.get(Toggle.class, pannel_name + "shift").setColorActive(color(#00ff00));
     flag_sh = true;
   } else {
@@ -222,7 +224,7 @@ void ef_wheel() {
 
 void handle_ef_wheel_toggle(CallbackEvent event) {
     int val = int(event.getController().getValue());
-  if (val == 0) {
+  if (val == 1) {
     cp5.get(Toggle.class, pannel_name + "wheel").setColorActive(color(#00ff00));
     flag_wl = true;
   } else {
@@ -252,7 +254,7 @@ void tick()
     cp5
       .addToggle(pannel_name + "switch_b")
       .setCaptionLabel("switch")
-      .setValue(!false)
+      .setValue(false)
       .setMode(ControlP5.SWITCH)
       .setPosition(10 + shift_x, 50 + shift_y)
       .setSize(80, 30)
@@ -363,7 +365,7 @@ void tick()
     cp5
       .addToggle(pannel_name + "splash")
       .setCaptionLabel("splash")
-      .setValue(!false)
+      .setValue(false)
       .setMode(ControlP5.SWITCH)
       .setPosition(10 + shift_x, 470 + shift_y)
       .setSize(80, 30)
@@ -388,7 +390,7 @@ void tick()
     cp5
       .addToggle(pannel_name + "shift")
       .setCaptionLabel("shift")
-      .setValue(!false)
+      .setValue(false)
       .setMode(ControlP5.SWITCH)
       .setPosition(10 + shift_x, 520 + shift_y)
       .setSize(80, 30)
@@ -414,7 +416,7 @@ void tick()
     cp5
       .addToggle(pannel_name + "wheel")
       .setCaptionLabel("wheel")
-      .setValue(!false)
+      .setValue(false)
       .setMode(ControlP5.SWITCH)
       .setPosition(10 + shift_x, 570 + shift_y)
       .setSize(80, 30)
