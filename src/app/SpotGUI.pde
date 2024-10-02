@@ -334,7 +334,7 @@ void tick()
     ;
 
     cp5
-      .addColorWheel(pannel_name + "picker", 480 + int(shift_x), 10 + int(shift_y), 500)
+      .addColorWheel(pannel_name + "picker", 480 + int(shift_x), 10 + int(shift_y), 400)
       .setCaptionLabel("")
       .onClick(new CallbackListener() {
       public void controlEvent(CallbackEvent event) {
@@ -477,7 +477,7 @@ void tick()
         .addButton(pannel_name + names[i])
         .setCaptionLabel("")
         .setPosition(480 + x + shift_x, 550 + y + shift_y)
-        .setSize(50, 30)
+        .setSize(30, 30)
         .setColorBackground(colors[i][0])
         .setColorForeground(colors[i][1])
         .setColorActive(colors[i][1])
@@ -490,11 +490,11 @@ void tick()
       )
       ;
 
-      y += 50;
+      y += 40;
 
       if (y > 100) {
         y = 0;
-        x += 70;
+        x += 40;
       }
     }
 
@@ -503,7 +503,7 @@ void tick()
     cp5
       .addSlider(pannel_name + "R")
       .setCaptionLabel("R")
-      .setPosition(770 + shift_x, 550 + shift_y)
+      .setPosition(670 + shift_x, 550 + shift_y)
       .setSize(200, 30)
       .setRange(0, 255)
       .lock()
@@ -512,7 +512,7 @@ void tick()
     cp5
       .addSlider(pannel_name + "G")
       .setCaptionLabel("G")
-      .setPosition(770 + shift_x, 600 + shift_y)
+      .setPosition(670 + shift_x, 600 + shift_y)
       .setSize(200, 30)
       .setRange(0, 255)
       .lock()
@@ -521,7 +521,7 @@ void tick()
     cp5
       .addSlider(pannel_name + "B")
       .setCaptionLabel("B")
-      .setPosition(770 + shift_x, 650 + shift_y)
+      .setPosition(670 + shift_x, 650 + shift_y)
       .setSize(200, 30)
       .setRange(0, 255)
       .lock()
