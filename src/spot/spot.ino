@@ -3,7 +3,6 @@
 
 #include <shs_DTP.h>
 #include <shsL_GRGB_API.h>
-#include <shs_APIprint.h>
 #include <shs_ControlWiFi.h>
 #include <shs_ByteCollector.h>
 #include <shs_ByteCollectorIterator.h>
@@ -19,22 +18,22 @@ void dtp_handler(shs::ByteCollectorReadIterator<> &it);
 #include <GRGB.h>
 GRGB chip(COMMON_CATHODE, Rp, Gp, Bp);
 
-shs::TcpClient client(SERVER_IP, PORT, 5);
+shs::TcpClient client(S_IP, PORT, THIS_ID);
 
 shs::GRGB_API grgb_api(chip, THIS_ID);
-shs::APIprint apip(THIS_ID);
-shs::DTP dtp(client, apip, THIS_ID);
+shs::DTP dtp(client, grgb_api, THIS_ID);
 
 
 // get temperature from the thermister
-//float getTemp(int resistance);
+float getTemp(int resistance);
 
 // control temperature and manage fan's power
-//void temperatureControl();
+void temperatureControl();
 
 void setup() {
   Serial.begin(115200);
-
+  analogWriteResolution(8);
+  analogWriteFreq(10000);
   //  Serial.println();
   //  WiFi.begin(WiFiSSID, WiFiPASS);
   //  while (WiFi.status() != WL_CONNECTED) {
@@ -50,26 +49,27 @@ void setup() {
 
   //shs::ControlWiFi::connectWiFi(WiFiSSID, WiFiPASS);
 
-  // pinMode(fan_p, OUTPUT);
+  pinMode(fan_p, OUTPUT);
 
-  // pinMode(therm_p, INPUT);
+  pinMode(therm_p, INPUT);
 
   // pinMode(RSp, OUTPUT);
   // pinMode(GSp, OUTPUT);
 
-  // chip.setBrightness(0);
-  // // chip.setRGB(0, 50, 0);
+  chip.setBrightness(0);
+  chip.setRGB(0, 50, 0);
 
-  Serial.println(client.connect(SERVER_IP, PORT));
-  Serial.println(client.connected());
-
-  client.start();
+  //client.start();
 }
 
 void loop() {
-  //temperatureControl();
+  temperatureControl();
+  //client.tick();
 
-  if (client.connected()) dtp.tick();
+
+
+  if (client.connected()) dtp.tick(); 
+  else if (client.connect(SERVER_IP, PORT)) client.write((uint8_t*)&THIS_ID, 4);
  
 
   // static uint32_t tmr{};
@@ -80,84 +80,49 @@ void loop() {
   // }
 }
 
-void dtp_handler(shs::ByteCollectorReadIterator<> &it) {
-  for (auto i = 0; i < it.size(); i++) {
-    Serial.print(it[i]);
-    Serial.print(" ");
-  }
-  uint8_t value{};
-  it.get(value);
-  Serial.print("Size: ");
-  Serial.println(value);
-  Serial.print("Command:  ");
-  it.get(value);
-  Serial.println(value);
 
-  if (value == 1) {
-    Serial.print("Value:  ");
-    it.get(value);
-    Serial.println(value);
-    Serial.println(it.size());
 
-  }
 
-  else {
+// temperature from the thermistor
+float getTemp(int resistance)
+{
 
-    Serial.print("Value:  ");
-    for (uint8_t i = 0; i < 3; i++) {
-      Serial.print(*it);
-      ++it;
-      Serial.print("  ");
-    }
-  }
+  float thermistor;
+  thermistor = resist_10k / ((float)1023 / resistance - 1);
+  thermistor /= resist_base;                       // (R/Ro)
+  thermistor = log(thermistor) / B_coef;           // 1/B * ln(R/Ro)
+  thermistor += (float)1.0 / (temp_base + 273.15); // + (1/To)
+  thermistor = (float)1.0 / thermistor - 273.15;   // invert and convert to degrees Celsius
 
-  Serial.println('\n');
+  return thermistor;
 }
 
+void temperatureControl()
+{
 
-// // temperature from the thermistor
-// float getTemp(int resistance)
-// {
+  static uint32_t tmr;
+  if (millis() - tmr >= 2000)
+  {
 
-//   float thermistor;
-//   thermistor = resist_10k / ((float)1023 / resistance - 1);
-//   thermistor /= resist_base;                       // (R/Ro)
-//   thermistor = log(thermistor) / B_coef;           // 1/B * ln(R/Ro)
-//   thermistor += (float)1.0 / (temp_base + 273.15); // + (1/To)
-//   thermistor = (float)1.0 / thermistor - 273.15;   // invert and convert to degrees Celsius
+    // analogReference(DEFAULT);
+    float temp = getTemp(analogRead(therm_p));
+    //  analogReference(EXTERNAL);
+    // Serial.println(temp);
 
-//   return thermistor;
-// }
-
-// void temperatureControl()
-// {
-
-//   static uint32_t tmr;
-//   if (millis() - tmr >= 2000)
-//   {
-
-//     // analogReference(DEFAULT);
-//     float temp = getTemp(analogRead(therm_p));
-//     //  analogReference(EXTERNAL);
-//     // Serial.println(temp);
-
-//     // if (temp >= 47) settings.mode = 0;
-//     // if (temp >= critTemp)
-//     // {
-//     //   int value = map(int(temp), critTemp, critTemp + 20, 40, 255);
-//     //   chip.setBrightness(value);
-//     // }
-//     // else
-//     //   chip.setBrightness(255);
-//     int fanPower = map(int(temp), minTemp, maxTemp, 170, 255);
-//     fanPower = constrain(fanPower, 170, 255);
-//     analogWrite(fan_p, fanPower);
-//     String str = "3,";
-//     str += temp;
-//     str += ',';
-//     str += fanPower;
-
-//     Serial.println(str);
-//     tmr = millis();
-//   }
-// }
+    // if (temp >= 47) settings.mode = 0;
+    // if (temp >= critTemp)
+    // {
+    //   int value = map(int(temp), critTemp, critTemp + 20, 40, 255);
+    //   chip.setBrightness(value);
+    // }
+    // else
+    //   chip.setBrightness(255);
+    int fanPower = map(int(temp), minTemp, maxTemp, 170, 255);
+    fanPower = constrain(fanPower, 170, 255);
+    analogWrite(fan_p, fanPower);
+    
+    //Serial.print(temp); Serial.print(' ');
+   // Serial.println(fanPower);
+    tmr = millis();
+  }
+}
