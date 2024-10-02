@@ -16,15 +16,19 @@ int fillVal = 0;
 
 int speed = 115200;
 
+byte LEFT_ID = 10;
+byte RIGHT_ID = 12;
+
 // =========================================================================================
 
 SpotVirtual sv1;
+SpotVirtual sv2;
 SpotGUI spg1;
 SpotGUI spg2;
 
 void setup() {
 
-  size(2000, 700);
+  size(1800, 700);
   cp5 = new ControlP5(this);
   
   cp5
@@ -42,9 +46,10 @@ void setup() {
   
   println(server.ip());
   
-  sv1 = new SpotVirtual(10, spotL);
+  sv1 = new SpotVirtual(10);
+  sv2 = new SpotVirtual(12);
   spg1 = new SpotGUI(0, 0, sv1, cp5, "spg1");
-  spg2 = new SpotGUI(1000, 0, sv1, cp5, "spg2");
+  spg2 = new SpotGUI(900, 0, sv2, cp5, "spg2");
   
   spg1.syncing = new SpotGUI[1];
   spg1.syncing[0] = spg2;
@@ -71,15 +76,21 @@ void sync(int val)
 
 void checkConnection()
 {
-  if (spotL != null && !spotL.active()) { spotL.stop(); spotL = null; }
-  if (spotL == null) {
+  if (sv1.spot != null && !sv1.spot.active()) { sv1.spot.stop(); sv1.spot = null; }
+  if (sv2.spot != null && !sv2.spot.active()) { sv2.spot.stop(); sv2.spot = null; }
+  
+  if (sv1.spot == null || sv2.spot == null) {
   Client cl = server.available();
   if (cl != null) {
-    spotL = cl;
-    sv1.spot = spotL;
-    println(spotL.ip());
+    if (cl.available() > 0) {
+    byte buf[] = cl.readBytes();
+    if (buf[0] == LEFT_ID && sv1.spot == null) sv1.spot = cl;
+    else if (buf[0] == RIGHT_ID && sv2.spot == null) sv2.spot = cl;
+    println(buf);
+    print(cl.ip());
   }
   }
+}
 }
 
 // ========================================================================================
