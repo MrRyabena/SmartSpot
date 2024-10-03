@@ -15,7 +15,7 @@
 //    setColor,
 //    setBrightness,
 //    setCRT,
-//    tick,t
+//    tick,
 //    fadeMode,
 //    setFadePeriod
 //};
@@ -23,7 +23,7 @@
 class SpotVirtual
 {
 
-
+  
   int id;
   Client spot;
 
@@ -32,6 +32,7 @@ class SpotVirtual
     this.id = set_ID;
     //this.spot = set_client;
   }
+  
 
   void setBright(int val)
   {
@@ -41,10 +42,6 @@ class SpotVirtual
     buf[1] = 13;
     buf[2] |= val;
 
-
-    println(spot == null);
-    //println(spotL == null);
-    println(val);
 
     if (spot != null) spot.write(buf);
   }
@@ -63,7 +60,35 @@ class SpotVirtual
 
     if (spot != null) spot.write(buf);
   }
+  
+  void setFadeMode(boolean fade)
+  {
+    byte[] buf = new byte[3];
 
+    buf[0] |= 3;
+    buf[1] |= 16;
+    buf[2] |= int(fade);
+   
+    if (spot != null) spot.write(buf);
+  }
+  
+  void setFadePeriod(int T)
+  {
+    byte[] buf = new byte[6];
+    
+    
+    
+     buf[0] = 6;
+  buf[1] = 17;
+  buf[2] = (byte)(T & 0xFF);
+  buf[3] = (byte)((T >> 8) & 0xFF);
+  buf[4] = (byte)((T >> 16) & 0xFF);
+  buf[5] = (byte)((T >> 24) & 0xFF);
+    
+   
+    if (spot != null) spot.write(buf);
+  }
+  
 
   //static enum Commands { no_command, setBright, setColor };
 }

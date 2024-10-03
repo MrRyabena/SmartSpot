@@ -43,12 +43,12 @@ public class SpotGUI
   }
 
   void updateColorRGB(color col) {
-    println(col);
+
     cp5.get(Slider.class, pannel_name + "R").setValue(red(col)).setColorForeground(color(red(col), 0, 0)).setColorActive(color(red(col), 0, 0));
     cp5.get(Slider.class, pannel_name + "G").setValue(green(col)).setColorForeground(color(0, green(col), 0)).setColorActive(color(0, green(col), 0));
     cp5.get(Slider.class, pannel_name + "B").setValue(blue(col)).setColorForeground(color(0, 0, blue(col))).setColorActive(color(0, 0, blue(col)));
     spot_virtual.setColor(col);
-    println("color!");
+
   }
 
   void updateColorPicker(color col) {
@@ -233,6 +233,16 @@ void handle_ef_wheel_toggle(CallbackEvent event) {
   }
 }
 
+void handle_ef_fade_toggle(CallbackEvent event)
+{
+     int val = int(event.getController().getValue());
+  if (val == 1) cp5.get(Toggle.class, pannel_name + "fade").setColorActive(color(#00ff00));
+  else cp5.get(Toggle.class, pannel_name + "fade").setColorActive(color(#ff0000));
+  
+  spot_virtual.setFadeMode(boolean(val));
+  if (syncing_flag) for (SpotGUI x : syncing) x.spot_virtual.setFadeMode(boolean(val));
+}
+
 
 /*
   -----------------Tick----------------
@@ -249,6 +259,19 @@ void tick()
   -----------------GUI----------------
 */
 
+void setFan(int fan)
+ {
+   cp5.get(Slider.class, pannel_name + "fan").setValue(float(fan));
+ }
+ 
+ void setTemp(int temp)
+ {
+   colorMode(HSB);
+   cp5.get(Slider.class, pannel_name + "temp").setValue(float(temp))
+        .setColorForeground(color(100 - map(cp5.get(Slider.class, pannel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255))
+        .setColorActive(color(100 - map(cp5.get(Slider.class, pannel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255));
+   colorMode(RGB);
+ }
   void guiSetup() {
 
     cp5
@@ -437,8 +460,40 @@ void tick()
       .setRange(0, 500)
       .setValue(200);
     ;
-  }
+    
+    cp5
+      .addToggle(pannel_name + "fade")
+      .setCaptionLabel("fade")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(10 + shift_x, 620 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        handle_ef_fade_toggle(event);
+      }
+    }
+    )
+    ;
 
+    cp5
+      .addSlider(pannel_name + "fd_time")
+      .setCaptionLabel("fade T")
+      .setPosition(100 + shift_x, 620 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 20000)
+      .setValue(500)
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        int T = int(event.getController().getValue());
+        spot_virtual.setFadePeriod(T);
+        if (syncing_flag) for (SpotGUI x : syncing) x.spot_virtual.setFadePeriod(T);
+      }
+      }
+      )
+  ;
+ }
 
   color colors[][] =
     {
