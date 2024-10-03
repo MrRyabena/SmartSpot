@@ -44,11 +44,9 @@ void setup() {
       
   server = new Server(this, 10002);
   
-<<<<<<< Updated upstream
-  
-=======
+
   println("Server started: ", server.ip());
->>>>>>> Stashed changes
+
   
   sv1 = new SpotVirtual(10);
   sv2 = new SpotVirtual(12);
@@ -69,12 +67,7 @@ void setup() {
   
   spg1.guiSetup();
   spg2.guiSetup();
-<<<<<<< Updated upstream
-  println(server.ip());
-=======
 
-  
->>>>>>> Stashed changes
 }
 
 void sync(int val)
@@ -96,7 +89,7 @@ void checkConnection()
     if (cl.available() > 0) {
     byte buf[] = cl.readBytes();
     if (buf[1] == LEFT_ID){
-      if (sv1.spot == null) { sv1.spot = cl; println("Connected LEFT_spot: ", cl.ip()); }
+      if (sv1.spot == null) { sv1.spot = cl; println("Connected LEFT_spot:  ", cl.ip()); }
       else if (buf[0] == 4) { spg1.setFan(int(buf[2])); spg1.setTemp(int(buf[3])); }
       tmr1 = millis();
     }
