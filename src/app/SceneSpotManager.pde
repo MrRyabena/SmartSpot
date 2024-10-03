@@ -44,7 +44,7 @@ void setup() {
       
   server = new Server(this, 10002);
   
-  println(server.ip());
+  
   
   sv1 = new SpotVirtual(10);
   sv2 = new SpotVirtual(12);
@@ -65,7 +65,7 @@ void setup() {
   
   spg1.guiSetup();
   spg2.guiSetup();
-  
+  println(server.ip());
 }
 
 void sync(int val)
