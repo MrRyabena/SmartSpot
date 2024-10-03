@@ -1,5 +1,6 @@
 #pragma once
 
+#undef DEBUG
 
 inline constexpr auto SERVER_IP = "192.168.1.10";
 inline constexpr uint32_t S_IP = (192 << 24) | (168 << 16) | (1 << 8) | 10;
@@ -8,7 +9,7 @@ inline constexpr auto PORT = 10002;
 inline constexpr auto WiFiSSID = "SHS_WiFi_2";
 inline constexpr auto WiFiPASS = "28841971";
 
-inline constexpr auto THIS_ID = 0xffffff00 | 12; //10;
+inline constexpr uint8_t THIS_ID = 10; //12;
 
 /*
  TX -- green
@@ -16,12 +17,12 @@ inline constexpr auto THIS_ID = 0xffffff00 | 12; //10;
 */
 
 // RGB:
-#define Rp 13 //15
-#define Gp 12 //13
-#define Bp 14 //12
+#define Rp 15 //13 
+#define Gp 13 //12
+#define Bp 12 //14
 
 
-#define fan_p 15 //14
+#define fan_p 14 //15
 
 #define maxTemp 40
 #define minTemp 30

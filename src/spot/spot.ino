@@ -7,7 +7,6 @@
 #include <shs_ByteCollector.h>
 #include <shs_ByteCollectorIterator.h>
 
-#include <shs_ControlWiFi.h>
 
 #include <ESP8266WiFi.h>
 #include <shs_TcpClient.h>
@@ -31,98 +30,61 @@ float getTemp(int resistance);
 void temperatureControl();
 
 void setup() {
-  Serial.begin(115200);
+ 
   analogWriteResolution(8);
   analogWriteFreq(10000);
-  //  Serial.println();
-  //  WiFi.begin(WiFiSSID, WiFiPASS);
-  //  while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print('.');
-  //   if (millis() >= 30000) ESP.restart();
-  // }
+  
   shs::ControlWiFi::connectWiFiWait();
-  Serial.println();
-  Serial.print("WiFi status: ");
-  Serial.println(shs::ControlWiFi::WiFiConnected());
-
-
-  //shs::ControlWiFi::connectWiFi(WiFiSSID, WiFiPASS);
 
   pinMode(fan_p, OUTPUT);
-
   pinMode(therm_p, INPUT);
 
-  // pinMode(RSp, OUTPUT);
-  // pinMode(GSp, OUTPUT);
-
   chip.setBrightness(0);
-  chip.setRGB(0, 50, 0);
 
-  //client.start();
 }
 
 void loop() {
+  chip.tick();
   temperatureControl();
-  //client.tick();
 
+  if (client.connected()) dtp.tick();
+  else if (client.connect(SERVER_IP, PORT)) client.write(&THIS_ID - 1, 2);
 
-
-  if (client.connected()) dtp.tick(); 
-  else if (client.connect(SERVER_IP, PORT)) client.write((uint8_t*)&THIS_ID, 4);
- 
-
-  // static uint32_t tmr{};
-  // if (millis() - tmr >= 200) {
-  //   static uint8_t value{};
-  //   chip.setWheel8(value++);
-  //   tmr = millis();
-  // }
 }
 
 
-
-
 // temperature from the thermistor
-float getTemp(int resistance)
-{
+float getTemp(int resistance) {
 
   float thermistor;
   thermistor = resist_10k / ((float)1023 / resistance - 1);
-  thermistor /= resist_base;                       // (R/Ro)
-  thermistor = log(thermistor) / B_coef;           // 1/B * ln(R/Ro)
-  thermistor += (float)1.0 / (temp_base + 273.15); // + (1/To)
-  thermistor = (float)1.0 / thermistor - 273.15;   // invert and convert to degrees Celsius
+  thermistor /= resist_base;                        // (R/Ro)
+  thermistor = log(thermistor) / B_coef;            // 1/B * ln(R/Ro)
+  thermistor += (float)1.0 / (temp_base + 273.15);  // + (1/To)
+  thermistor = (float)1.0 / thermistor - 273.15;    // invert and convert to degrees Celsius
 
   return thermistor;
 }
 
-void temperatureControl()
-{
+void temperatureControl() {
 
   static uint32_t tmr;
-  if (millis() - tmr >= 2000)
-  {
+  if (millis() - tmr >= 2000) {
 
-    // analogReference(DEFAULT);
     float temp = getTemp(analogRead(therm_p));
-    //  analogReference(EXTERNAL);
-    // Serial.println(temp);
 
-    // if (temp >= 47) settings.mode = 0;
-    // if (temp >= critTemp)
-    // {
-    //   int value = map(int(temp), critTemp, critTemp + 20, 40, 255);
-    //   chip.setBrightness(value);
-    // }
-    // else
-    //   chip.setBrightness(255);
     int fanPower = map(int(temp), minTemp, maxTemp, 170, 255);
     fanPower = constrain(fanPower, 170, 255);
     analogWrite(fan_p, fanPower);
+
+    shs::ByteCollector<> bc(4);
+    bc.push_back(4, 1);
+    bc.push_back(THIS_ID, 1);
+    bc.push_back(fanPower, 1);
+    bc.push_back((uint8_t)temp, 1);
+    if (client.connected()) dtp.sendRAW(bc);
+
     
-    //Serial.print(temp); Serial.print(' ');
-   // Serial.println(fanPower);
     tmr = millis();
   }
 }
