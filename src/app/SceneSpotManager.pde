@@ -44,7 +44,11 @@ void setup() {
       
   server = new Server(this, 10002);
   
+<<<<<<< Updated upstream
   
+=======
+  println("Server started: ", server.ip());
+>>>>>>> Stashed changes
   
   sv1 = new SpotVirtual(10);
   sv2 = new SpotVirtual(12);
@@ -65,32 +69,45 @@ void setup() {
   
   spg1.guiSetup();
   spg2.guiSetup();
+<<<<<<< Updated upstream
   println(server.ip());
+=======
+
+  
+>>>>>>> Stashed changes
 }
 
 void sync(int val)
 {
  spg1.syncing_flag = !boolean(val); 
- println(!boolean(val));
 }
 
+
+long tmr1, tmr2 = 0;
 void checkConnection()
 {
-  if (sv1.spot != null && !sv1.spot.active()) { sv1.spot.stop(); sv1.spot = null; }
-  if (sv2.spot != null && !sv2.spot.active()) { sv2.spot.stop(); sv2.spot = null; }
   
-  if (sv1.spot == null || sv2.spot == null) {
+  if (sv1.spot != null && (!sv1.spot.active() || millis() - tmr1 > 10000)) { sv1.spot.stop(); sv1.spot = null; println("Connection lost: LEFT_spot"); }
+  if (sv2.spot != null && (!sv2.spot.active() || millis() - tmr2 > 10000)) { sv2.spot.stop(); sv2.spot = null; println("Connection lost: RIGHT_spot"); }
+  
+  
   Client cl = server.available();
   if (cl != null) {
     if (cl.available() > 0) {
     byte buf[] = cl.readBytes();
-    if (buf[0] == LEFT_ID && sv1.spot == null) sv1.spot = cl;
-    else if (buf[0] == RIGHT_ID && sv2.spot == null) sv2.spot = cl;
-    println(buf);
-    print(cl.ip());
+    if (buf[1] == LEFT_ID){
+      if (sv1.spot == null) { sv1.spot = cl; println("Connected LEFT_spot: ", cl.ip()); }
+      else if (buf[0] == 4) { spg1.setFan(int(buf[2])); spg1.setTemp(int(buf[3])); }
+      tmr1 = millis();
+    }
+    else if (buf[1] == RIGHT_ID) {
+       if (sv2.spot == null) { sv2.spot = cl; println("Connected RIGHT_spot: ", cl.ip()); }
+      else if (buf[0] == 4) { spg2.setFan(int(buf[2])); spg2.setTemp(int(buf[3])); }
+      tmr2 = millis();
+    }
   }
   }
-}
+
 }
 
 // ========================================================================================
@@ -102,27 +119,4 @@ void draw() {
   spg1.tick();
   spg2.tick();
 
-  //thread("br_tick");
-  //thread("ef_tick");
-  //fill(255);
-  //if (spot != null && spot.available() > 0) {
-  //  if (spot.available() < 7) return;
-  //  //println(spot.readString());
-  //  String str = spot.readStringUntil('\n');
-  //  str = str.trim();
-  //  String data[] = str.split(",");
-  //  if (data.length < 3) return;
-  //  switch (int(data[0])) {
-  //  case 3:
-  //    colorMode(HSB);
-  //    cp5.get(Slider.class, "temp")
-  //      .setValue(float(data[1]))
-  //      .setColorForeground(color(100 - map(cp5.get(Slider.class, "temp").getValue(), 20, 50, 0, 100), 255, 255))
-  //      .setColorActive(color(100 - map(cp5.get(Slider.class, "temp").getValue(), 20, 50, 0, 100), 255, 255));
-
-  //    cp5.get(Slider.class, "fan").setValue(float(data[2]));
-  //    colorMode(RGB);
-  //    break;
-  //  }
-  //}
 }
