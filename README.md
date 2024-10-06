@@ -1,2 +1,25 @@
-# SceneSpot
- 
+# SmartSpot
+
+Мощный RGB-прожектор с дистанционным управлением по WiFi и встроенными эффектами.</br>
+
+- **_SmartSpot_** основан на проекте **AlexGyver'a [RGBspot](https://alexgyver.ru/rgbspot/)**, но значительно переделан и доработан.</br>
+- Внутри кода используется ядро и библиотека основного проекта — **_[SmartHomeSystem](https://github.com/MrRyabena/SmartHomeSystem/tree/v1.2.0)_**.</br>
+- **_SmartSpot_** — первое самостоятельное устройство, интегрированное в **_SmartHomeSystem_**.
+- Для дистанционного управления написано GUI-приложение, пока что на processing (может быть будет переписано на C++ (Qt)).
+
+<a id="versions"></a>
+
+## Versions
+
+<details><summary>v1.0.0 — created management, API and GUI.</summary>
+
+</details>
+
+## Содержание
+
+- Возможности
+- Техническая реализация
+- Программная реализация
+- Развитие проекта
+
+...
