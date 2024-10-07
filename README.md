@@ -72,7 +72,7 @@
 
 <p float="left">
 
-<img src="./photo/DSC_2777L.jpg" width="33%" />
+<img src="./photo/DSC_2777L.png" width="33%" />
 <img src="./photo/DSC_2797L.jpg" width="33%" />
 <img src="./photo/DSC_2787L.jpg" width="33%" />
 <img src="./photo/DSC_2790L.jpg" width="33%" />
