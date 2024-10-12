@@ -17,6 +17,7 @@
 
 ## Содержание
 
+- [Структура проекта](#structure)
 - [Возможности](#features)
   - [Технические характеристики](#technical_specifications)
 - [Техническая реализация](#technical_implementation)
@@ -25,6 +26,17 @@
   - Управляющий контроллер
   - GUI приложение
 - Развитие проекта
+
+<a id="structure"></a>
+
+## Структура проекта
+
+- [libraries](./libraries/) — архив с библиотеками.
+- [photo](./photo/) — фотографии сборки и работы SmartSpot.
+- [schemes](./schemes/) — схемы и чертежи.
+- [src](./src/) — программный код
+  - [app](./src/app/) — GIU-приложение, написанное на Processing.
+  - [spot](./src/spot/) — прошивка для управляющего микроконтроллера.
 
 <a id="features"></a>
 
@@ -91,4 +103,3 @@
 <a id="software_implementation"></a>
 
 ## Программная реализация
-
