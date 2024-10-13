@@ -1,4 +1,4 @@
-libraries/* linguist-vendored
+libraries/* linguist-vendored=false
 
 # Auto detect text files and perform LF normalization
 * text eol=lf
