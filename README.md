@@ -18,22 +18,23 @@
 
 ## Versions
 
-<details><summary>v1.0.0 — <b>[current]</b> created management, API and GUI.</summary>
+<details>
+<summary>v1.0.0 — <b>[current]</b> created management, API and GUI.</summary>
 
-This initial release of SmartSpot includes the following features:
-
-- Developed firmware for the ESP8266 microcontroller
-- Created a GUI application using Processing for remote control
-- Established WiFi communication between the spot and the control application
-- Added support for simultaneous control of multiple SmartSpots
-- Implemented a small set of RGB effects:
-  - SetColor: Set any custom color
-  - Splash: Quick brightness changes (flashes)
-  - Shift: Pairwise color switching with shift along the color wheel
-  - ColorWheel: Smooth color change in a circular pattern
-  - Fade: Enable/disable and adjust smoothing time for color transitions
-
-This release provides a solid foundation for the SmartSpot project, offering basic functionality and remote control capabilities.
+> This initial release of SmartSpot includes the following features:</br>
+>
+> - Developed firmware for the ESP8266 microcontroller
+> - Created a GUI application using Processing for remote control
+> - Established WiFi communication between the spot and the control application
+> - Added support for simultaneous control of multiple SmartSpots
+> - Implemented a small set of RGB effects:
+>   - SetColor: Set any custom color
+>   - Splash: Quick brightness changes (flashes)
+>   - Shift: Pairwise color switching with shift along the color wheel
+>   - ColorWheel: Smooth color change in a circular pattern
+>   - Fade: Enable/disable and adjust smoothing time for color transitions
+> 
+> This release provides a solid foundation for the SmartSpot project, offering basic functionality and remote control capabilities.
 
 </details>
 
