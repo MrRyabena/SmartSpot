@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/Test.dir/os_worktest.cpp.o CMakeFiles/Test.dir/home/dan/SHS/src/SHScore/shs_TaskManager.cpp.o CMakeFiles/Test.dir/home/dan/SHS/src/SHScore/shs_OS.cpp.o -o Test
