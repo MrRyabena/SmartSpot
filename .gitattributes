@@ -1,3 +1,5 @@
+libraries/* linguist-vendored
+
 # Auto detect text files and perform LF normalization
 * text eol=lf
 
