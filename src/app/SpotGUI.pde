@@ -283,8 +283,8 @@ void fire_tick() {
     colorMode(HSB);
     color col = color(
       constrain(map(fireValue, 20, 60, HUE_START, HUE_START + HUE_GAP), 0, 255),  // H
-      constrain(map(fireValue, 20, 60, MAX_SAT, MIN_SAT), 0, 100),                // S
-      constrain(map(fireValue, 20, 60, MIN_BRIGHT, MAX_BRIGHT), 0, 100)           // V
+      constrain(map(fireValue, 20, 60, MAX_SAT, MIN_SAT), 0, 255),                // S
+      constrain(map(fireValue, 20, 60, MIN_BRIGHT, MAX_BRIGHT), 0, 255)           // V
     );
     colorMode(RGB);
     
