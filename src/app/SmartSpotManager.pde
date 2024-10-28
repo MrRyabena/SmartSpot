@@ -28,7 +28,7 @@ SpotGUI spg2;
 
 void setup() {
 
-  size(1800, 700);
+  size(1800, 750);
   cp5 = new ControlP5(this);
   
   cp5

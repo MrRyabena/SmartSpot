@@ -243,6 +243,56 @@ void handle_ef_fade_toggle(CallbackEvent event)
   if (syncing_flag) for (SpotGUI x : syncing) x.spot_virtual.setFadeMode(boolean(val));
 }
 
+void handle_ef_fire_toggle(CallbackEvent event)
+{
+   int val = int(event.getController().getValue());
+   if (val == 1) { cp5.get(Toggle.class, pannel_name + "fire").setColorActive(color(#00ff00)); flag_fr = true; }
+   else { cp5.get(Toggle.class, pannel_name + "fire").setColorActive(color(#ff0000)); flag_fr = false; }
+  
+}
+
+  int prevTime, prevTime2;
+  byte fireRnd = 0;
+  float fireValue = 0;
+  
+  boolean flag_fr = false;
+  
+  // настройки пламени
+int HUE_START = 0;    // начальный цвет огня (0 красный, 80 зелёный, 140 молния, 190 розовый)
+int HUE_GAP = 10;     // коэффициент цвета огня (чем больше - тем дальше заброс по цвету)
+float SMOOTH_K = 0.10;  // коэффициент плавности огня
+int MIN_BRIGHT = 150;  // мин. яркость огня
+int MAX_BRIGHT = 255; // макс. яркость огня
+int MIN_SAT = 255;    // мин. насыщенность
+int MAX_SAT = 255;    // макс. насыщенность
+
+
+void fire_tick() {
+
+  if (flag_fr) {
+  // задаём направление движения огня
+  if (millis() - prevTime > 100) {
+    prevTime = millis();
+    fireRnd = byte(random(2, 10));
+  }
+  // двигаем пламя
+  if (millis() - prevTime2 > 20) {
+    prevTime2 = millis();
+    fireValue = (float)fireValue * (1 - SMOOTH_K) + (float)fireRnd * 10 * SMOOTH_K;
+    
+    colorMode(HSB);
+    color col = color(
+      constrain(map(fireValue, 20, 60, HUE_START, HUE_START + HUE_GAP), 0, 255),  // H
+      constrain(map(fireValue, 20, 60, MAX_SAT, MIN_SAT), 0, 100),                // S
+      constrain(map(fireValue, 20, 60, MIN_BRIGHT, MAX_BRIGHT), 0, 100)           // V
+    );
+    colorMode(RGB);
+    
+    setColor(col);
+  }
+    
+  }
+}
 
 /*
   -----------------Tick----------------
@@ -252,6 +302,7 @@ void tick()
     brightOFF(); 
     brightON();
     ef_tick();
+    fire_tick();
 }
 
 
@@ -493,6 +544,22 @@ void setFan(int fan)
       }
       )
   ;
+  
+  cp5
+      .addToggle(pannel_name + "fire")
+      .setCaptionLabel("fire")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(10 + shift_x, 670 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        handle_ef_fire_toggle(event);
+      }
+    }
+    )
+    ;
  }
 
   color colors[][] =
