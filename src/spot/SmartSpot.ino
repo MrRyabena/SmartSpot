@@ -11,80 +11,114 @@
 #include <ESP8266WiFi.h>
 #include <shs_TcpClient.h>
 
-
-void dtp_handler(shs::ByteCollectorReadIterator<> &it);
-
+#include <GyverDS18.h>
 #include <GRGB.h>
+#include "shsL_RGBmusic.h"
+#include "shsL_RGBmusic_API.h"
+
+//shs::TcpClient client();
+WiFiClient client;
+
+#include <shs_API.h>
+#include <shs_ID.h>
+
+
+class SpotAPI : public shs::API
+{
+public:
+    SpotAPI(shs::GRGB_API& grgb_api, shs::RGBmusic_API& music_api, const shs::ID id)
+        : API(id), m_grgb_api(grgb_api), m_music_api(music_api)
+    {
+    }
+
+    void handle(shs::ByteCollectorReadIterator<>& it) override
+    {
+        ++it;
+        switch (it.read())
+        {
+            case 1: it.set_position(1); m_grgb_api.handle(it); break;
+            case 2: it.set_position(1); m_music_api.handle(it); break;
+        }
+    }
+
+private:
+    shs::GRGB_API& m_grgb_api;
+    shs::RGBmusic_API& m_music_api;
+};
+
+
+GyverDS18Single temp_sensor(TEMP_SENS_PIN);
 GRGB chip(COMMON_CATHODE, Rp, Gp, Bp);
-
-shs::TcpClient client(S_IP, PORT, THIS_ID);
-
+shs::RGBmusic rgb_music(chip, MUSICp);
+shs::RGBmusic_API music_api(rgb_music, THIS_ID);
 shs::GRGB_API grgb_api(chip, THIS_ID);
-shs::DTP dtp(client, grgb_api, THIS_ID);
+
+SpotAPI spot_api(grgb_api, music_api, THIS_ID);
+
+shs::DTP dtp(client, spot_api, THIS_ID);
 
 
-// get temperature from the thermister
-float getTemp(int resistance);
 
 // control temperature and manage fan's power
 void temperatureControl();
 
 void setup() {
- 
-  analogWriteResolution(8);
-  analogWriteFreq(10000);
-  
-  shs::ControlWiFi::connectWiFiWait();
+    //Serial.begin(115200);
+    //analogWriteResolution(8);
+    //analogWriteFreq(10000);
 
-  pinMode(fan_p, OUTPUT);
-  pinMode(therm_p, INPUT);
+    shs::ControlWiFi::connectWiFiWait();
 
-  chip.setBrightness(0);
+    pinMode(fan_p, OUTPUT);
+   // pinMode(therm_p, INPUT);
+
+    chip.setBrightness(0);
+    rgb_music.start();
+    rgb_music.analyzer.setDt(5000);
+    //rgb_music.setEffect(shs::RGBmusic::PULSE_WHEEL);
 
 }
 
 void loop() {
-  chip.tick();
-  temperatureControl();
-
-  if (client.connected()) dtp.tick();
-  else if (client.connect(SERVER_IP, PORT)) client.write(&THIS_ID - 1, 2);
-
+    chip.tick();
+    yield();
+    temperatureControl();
+    yield();
+    rgb_music.tick();
+    yield();
+    if (client.connected()) dtp.tick();
+    else if (client.connect(SERVER_IP, PORT)) client.write(&THIS_ID - 1, 2);
 }
 
-
-// temperature from the thermistor
-float getTemp(int resistance) {
-
-  float thermistor;
-  thermistor = resist_10k / ((float)1023 / resistance - 1);
-  thermistor /= resist_base;                        // (R/Ro)
-  thermistor = log(thermistor) / B_coef;            // 1/B * ln(R/Ro)
-  thermistor += (float)1.0 / (temp_base + 273.15);  // + (1/To)
-  thermistor = (float)1.0 / thermistor - 273.15;    // invert and convert to degrees Celsius
-
-  return thermistor;
-}
 
 void temperatureControl() {
 
-  static uint32_t tmr;
-  if (millis() - tmr >= 2000) {
+    static uint32_t tmr{};
+    static int16_t temp{};
+    static uint8_t fanPower{};
 
-    float temp = getTemp(analogRead(therm_p));
+    if (millis() - tmr >= 4000)
+    {
+        if (temp_sensor.ready() && temp_sensor.readTemp())
+        {
+            temp = temp_sensor.getTempInt();
+            fanPower = constrain(map(temp, MIN_TEMP, MAX_TEMP, MIN_POWER, MAX_POWER), MIN_POWER, MAX_POWER);
+        }
+        
 
-    int fanPower = map(int(temp), minTemp, maxTemp, 170, 255);
-    fanPower = constrain(fanPower, 170, 255);
-    analogWrite(fan_p, fanPower);
+        shs::ByteCollector<> bc(4);
+        bc.push_back(4, 1);
+        bc.push_back(THIS_ID, 1);
+        bc.push_back(fanPower, 1);
+        bc.push_back((uint8_t)temp, 1);
+        if (client.connected()) dtp.sendRAW(bc);
 
-    shs::ByteCollector<> bc(4);
-    bc.push_back(4, 1);
-    bc.push_back(THIS_ID, 1);
-    bc.push_back(fanPower, 1);
-    bc.push_back((uint8_t)temp, 1);
-    if (client.connected()) dtp.sendRAW(bc);
+        if (!temp_sensor.isWaiting()) temp_sensor.requestTemp();
 
-    
-    tmr = millis();
-  }
+        analogWrite(fan_p, fanPower);
+
+        tmr = millis();
+    }
+
 }
+
