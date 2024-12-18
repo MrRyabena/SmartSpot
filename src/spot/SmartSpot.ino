@@ -103,7 +103,9 @@ void temperatureControl() {
         {
             temp = temp_sensor.getTempInt();
             fanPower = constrain(map(temp, MIN_TEMP, MAX_TEMP, MIN_POWER, MAX_POWER), MIN_POWER, MAX_POWER);
+            if (temp <= 28) fanPower = 0;
         }
+
         
 
         shs::ByteCollector<> bc(4);

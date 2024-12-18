@@ -6,7 +6,7 @@
 //#include <shs_debug.h>
 
 
-#define RIGHT_SPOT
+//#define RIGHT_SPOT
 
 #ifdef RIGHT_SPOT
 
