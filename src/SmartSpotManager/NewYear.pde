@@ -8,7 +8,7 @@ int times[][] =
   { 14, 35, 14, 55 },
 };
 
-boolean AutoTime_flag = true;
+boolean AutoTime_flag = false;
 
 AutoTime at;
 AutoPlayerClass ap;

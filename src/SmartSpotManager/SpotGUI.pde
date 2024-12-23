@@ -22,9 +22,11 @@ public class SpotGUI
   SpotGUI[] syncing;
   boolean syncing_flag;
   PApplet parrent;
+  VolAnalyzerGUI va_gui;
 
   public SpotGUI(PApplet parrent, float x, float y, SpotVirtual spot, String pannel_name)
   {
+   
     this.parrent = parrent;
     this.shift_x = x;
     this.shift_y = y;
@@ -38,8 +40,10 @@ public class SpotGUI
       .setColorForeground(guiColors[4])
       .setFont(createFont("Calibri", 18))  // сделаем шрифт побольше
       ;
-    //cp;
+
     this.syncing_flag = false;
+    
+    va_gui = new VolAnalyzerGUI(parrent, cp5, pannel_name, 480 + shift_x, 600 + shift_y, spot);
   }
 
   public void updateSpot()
@@ -63,12 +67,27 @@ public class SpotGUI
 
     // set music
     spot_virtual.setMusicEffect(byte(cp5.getController(pannel_name + "RGBmusic").getValue()));
+    //va_gui.update();
   }
 
   public void setSyncing(boolean flag)
   {
     syncing_flag = flag;
-    for (SpotGUI x : syncing) x.setEnabled(!flag);
+    int i = 0;
+    
+    if (flag) {
+      va_gui.spots = new SpotVirtual[syncing.length + 1];
+      va_gui.spots[0] = spot_virtual;
+    }
+    for (SpotGUI x : syncing) {
+      x.setEnabled(!flag);
+      if (flag) va_gui.spots[i + 1] = x.spot_virtual;
+      i++;
+    }
+    if (!flag) {
+      va_gui.spots = new SpotVirtual[1];
+      va_gui.spots[0] = this.spot_virtual;
+    }
   }
 
   void hide()
@@ -408,6 +427,19 @@ public class SpotGUI
       tmr_ny = millis();
     }
   }
+  
+  
+    void handle_fan_toggle(CallbackEvent event)
+  {
+    int val = int(event.getController().getValue());
+    if (val == 1) {
+      cp5.get(Toggle.class, pannel_name + "fan_b").setColorActive(color(#00ff00));
+      spot_virtual.setCooling(byte(255));
+    } else {
+      cp5.get(Toggle.class, pannel_name + "fan_b").setColorActive(color(#ff0000));
+      spot_virtual.setCooling(byte(0));
+    }
+  }
 
   /*
   -----------------Tick----------------
@@ -715,6 +747,23 @@ public class SpotGUI
     }
     )
     ;
+    
+    
+        cp5
+      .addToggle(pannel_name + "fan_b")
+      .setCaptionLabel("fan")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(100 + shift_x, 10 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        handle_fan_toggle(event);
+      }
+    }
+    )
+    ;
   }
 
 
@@ -817,6 +866,7 @@ public class SpotGUI
       .addItem("PULSE_WHEEL", 3)
       .addItem("FIRE", 4)
       .setValue(0)
+      .setOpen(false) 
       .onClick(new CallbackListener() {
       public void controlEvent(CallbackEvent event) {
         if (spot_virtual != null) spot_virtual.setMusicEffect(byte(event.getController().getValue()));
