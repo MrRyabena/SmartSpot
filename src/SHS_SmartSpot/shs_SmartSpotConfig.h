@@ -21,8 +21,9 @@ struct shs::SmartSpotConfig
 
     // chip
     shs::t::shs_pin_t RED_PIN{ 33 };
-    shs::t::shs_pin_t BLUE_PIN{ 19 };
-    shs::t::shs_pin_t GREEN_PIN{ 23 };
+    shs::t::shs_pin_t GREEN_PIN{ 19 };
+    shs::t::shs_pin_t BLUE_PIN{ 23 };
+
 
     // fan
     shs::t::shs_pin_t FAN_PIN{ 5 };
