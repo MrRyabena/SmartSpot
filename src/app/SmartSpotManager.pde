@@ -16,13 +16,17 @@ int fillVal = 0;
 
 int speed = 115200;
 
-byte LEFT_ID = 10;
-byte RIGHT_ID = 12;
+byte LEFT_ID_1 = 11;
+byte LEFT_ID_2 = 12;
+byte RIGHT_ID_1 = 14;
+byte RIGHT_ID_2 = 15;
 
 // =========================================================================================
 
-SpotVirtual sv1;
-SpotVirtual sv2;
+SpotVirtual sv_l1;
+SpotVirtual sv_l2;
+SpotVirtual sv_r1;
+SpotVirtual sv_r2;
 SpotGUI spg1;
 SpotGUI spg2;
 
@@ -48,12 +52,14 @@ void setup() {
   println("Server started: ", server.ip());
 
   
-  sv1 = new SpotVirtual(10);
-  sv2 = new SpotVirtual(12);
-  spg1 = new SpotGUI(0, 0, sv1, cp5, "spg1");
-  spg2 = new SpotGUI(900, 0, sv2, cp5, "spg2");
+  sv_l1 = new SpotVirtual(LEFT_ID_1);
+  sv_l2 = new SpotVirtual(LEFT_ID_2);
+  sv_r1 = new SpotVirtual(RIGHT_ID_1);
+  sv_r2 = new SpotVirtual(RIGHT_ID_2);
+  spg1 = new SpotGUI(0, 0, sv_l1, cp5, "spg1");
+  spg2 = new SpotGUI(900, 0,sv_r1, cp5, "spg2");
   
-  spg1.syncing = new SpotGUI[1];
+  spg1.syncing = new SpotGUI[2];
   spg1.syncing[0] = spg2;
 
   cp5
@@ -76,27 +82,46 @@ void sync(int val)
 }
 
 
-long tmr1, tmr2 = 0;
+long tmr1, tmr2, tmr3, tmr4 = 0;
 void checkConnection()
 {
   
-  if (sv1.spot != null && (!sv1.spot.active() || millis() - tmr1 > 10000)) { sv1.spot.stop(); sv1.spot = null; println("Connection lost: LEFT_spot"); }
-  if (sv2.spot != null && (!sv2.spot.active() || millis() - tmr2 > 10000)) { sv2.spot.stop(); sv2.spot = null; println("Connection lost: RIGHT_spot"); }
-  
+  //if (sv_l1.spot != null && (!sv_l1.spot.active() || millis() - tmr1 > 10000)) { sv_l1.spot.stop(); sv_l1.spot = null; println("Connection lost: LEFT_1"); }
+  if (sv_r1.spot != null && (!sv_r1.spot.active() || millis() - tmr2 > 10000)) { sv_r1.spot.stop(); sv_r1.spot = null; println("Connection lost: RIGHT_1"); }
+    if (sv_l2.spot != null && (!sv_l2.spot.active() || millis() - tmr3 > 10000)) { sv_l2.spot.stop(); sv_l2.spot = null; println("Connection lost: LEFT_2"); }
+  if (sv_r2.spot != null && (!sv_r2.spot.active() || millis() - tmr4 > 10000)) { sv_r2.spot.stop(); sv_r2.spot = null; println("Connection lost: RIGHT_2"); }
   
   Client cl = server.available();
   if (cl != null) {
     if (cl.available() > 0) {
     byte buf[] = cl.readBytes();
-    if (buf[1] == LEFT_ID){
-      if (sv1.spot == null) { sv1.spot = cl; println("Connected LEFT_spot:  ", cl.ip()); }
-      else if (buf[0] == 4) { spg1.setFan(int(buf[2])); spg1.setTemp(int(buf[3])); }
+    
+    int index = 5; // 3;
+    
+    for (int i = 0; i < buf.length; i++) println(buf[i]);
+
+    if (buf[index] == LEFT_ID_1){
+      if (sv_l1.spot == null) { sv_l1.spot = cl; println("Connected spot LEFT_1:  ", cl.ip()); }
+      if (buf.length > 11 && buf[11] == 4) { spg1.setFan(int(buf[12])); spg1.setTemp(int(buf[13])); }
       tmr1 = millis();
     }
-    else if (buf[1] == RIGHT_ID) {
-       if (sv2.spot == null) { sv2.spot = cl; println("Connected RIGHT_spot: ", cl.ip()); }
-      else if (buf[0] == 4) { spg2.setFan(int(buf[2])); spg2.setTemp(int(buf[3])); }
+
+    else if (buf[index] == RIGHT_ID_1) {
+      if (sv_r1.spot == null) { sv_r1.spot = cl; println("Connected spot RIGHT_1: ", cl.ip()); }
+      if (buf.length > 11 && buf[11] == 4) { spg1.setFan(int(buf[12])); spg1.setTemp(int(buf[13])); }
       tmr2 = millis();
+    }
+
+    else if (buf[index] == LEFT_ID_2)
+    {
+      if (sv_l2.spot == null) { sv_l2.spot = cl; println("Connected spot LEFT_2: ", cl.ip());}
+      tmr3 = millis();
+    }
+
+    else if (buf[index] == RIGHT_ID_2)
+    {
+      if (sv_r2.spot == null) { sv_r2.spot = cl; println("Connected spot RIGHT_2: ", cl.ip());}
+      tmr4 = millis();
     }
   }
   }
