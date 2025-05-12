@@ -2,7 +2,7 @@
 libraries/** linguist-vendored
 
 # Auto detect text files and perform LF normalization
-* text eol=lf
+# * text eol=lf
 
 *.c text
 *.h text
@@ -19,6 +19,7 @@ libraries/** linguist-vendored
 *.txt text
 
 *.png binary
+*.bin binary
 *.jpg binary
 *.jpeg binary
 *.gif binary
