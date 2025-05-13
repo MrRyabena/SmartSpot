@@ -1,7 +1,7 @@
 {
     "name": "SmartSpot",
     "about": "Powerful RGB spotlight with Wi-Fi remote control and built-in effects.",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "notes": "Update cooling settings.",
     "builds": [
         {
