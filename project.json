@@ -8,9 +8,6 @@
             "chipFamily": "ESP32",
 
                     "parts": [
-                               { "path": "https://raw.githubusercontent.com/MrRyabena/SmartSpot/v2.x.x/src/firmwares/esp32/bin/SmartSpot.ino.bootloader.bin", "offset": 4096 },
-                               { "path": "https://raw.githubusercontent.com/MrRyabena/SmartSpot/v2.x.x/src/firmwares/esp32/bin/SmartSpot.ino.partitions.bin", "offset": 32768 },
-                               { "path": "https://raw.githubusercontent.com/MrRyabena/SmartSpot/v2.x.x/src/firmwares/esp32/bin/boot_app0.bin", "offset": 57344 },
                                { "path": "https://raw.githubusercontent.com/MrRyabena/SmartSpot/v2.x.x/src/firmwares/esp32/bin/SmartSpot.ino.bin", "offset": 65536 }
                             ]
         }
