@@ -1,8 +1,8 @@
 {
     "name": "SmartSpot",
     "about": "Powerful RGB spotlight with Wi-Fi remote control and built-in effects.",
-    "version": "2.0.10",
-    "notes": "Fixed a bug in api ID.",
+    "version": "2.0.11",
+    "notes": "Fixed a bug in getTemperature().",
     "builds": [
         {
             "chipFamily": "ESP32",
