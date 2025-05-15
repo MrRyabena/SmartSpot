@@ -68,16 +68,16 @@ public class SpotGUI {
     //  va_gui.spots[0] = spot_virtual;
     //}
     //for (SpotGUI x : syncing) {
-    //  x.setEnabled(!flag);
-    //  if (flag)
-    //    va_gui.spots[i + 1] = x.spot_virtual;
-    //  i++;
-    //}
+      //x.setEnabled(!flag);
+      //if (flag) va_gui.spots[i + 1] = x.spot_virtual;
+     // i++;
+   // }
     //if (!flag) {
     //  va_gui.spots = new SpotVirtual[1];
     //  va_gui.spots[0] = this.spot_virtual;
     //}
-  }
+  //}
+}
 
   void hide() {
     for (ControllerInterface c : cp5.getAll()) {
@@ -459,13 +459,13 @@ public class SpotGUI {
   void setFan(int fan, int ind)
   {
     cp5.get(Slider.class, panel_name + "fan" + str(ind)).setValue(float(fan));
-    println();
-    println("fan",  str(ind), fan);
+    //println();
+    //println("fan",  str(ind), fan);
   }
 
   void setTemp(int temp, int ind)
   {
-        println(panel_name + "temp" + str(ind), temp);
+      //  println(panel_name + "temp" + str(ind), temp);
     colorMode(HSB);
     cp5.get(Slider.class, panel_name + "temp" + str(ind)).setValue(float(temp))
       .setColorForeground(color(100 - map(cp5.get(Slider.class,panel_name + "temp" + str(ind)).getValue(), 20, 50, 0, 100), 255, 255))

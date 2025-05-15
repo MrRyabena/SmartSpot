@@ -76,33 +76,34 @@ void setup() {
 
 
   sp_left.syncing = new SpotGUI[1];
-  //sp_left.syncing[0] = sp_right;
+  sp_left.syncing[0] = sp_right;
 
   sp_left.guiSetup();
   sp_right.guiSetup();
   //   sp_left.cp5.getController("sp_leftbr_maxBr").setValue(210);
-  //   sp_left.cp5.getController("sp_leftbright").setValue(0);
-  //   sp_right.cp5.getController("sp_rightbr_maxBr").setValue(210);
-  //   sp_right.cp5.getController("sp_rightbright").setValue(0);
+  sp_left.cp5.getController("sp_leftbright").setValue(0);
+  sp_right.cp5.getController("sp_rightbr_maxBr").setValue(210);
+  sp_right.cp5.getController("sp_rightbright").setValue(0);
 }
 
 void s_sync(int val) {
-  //println(val);
-  //sp_left.setSyncing(boolean(val));
+   sp_left.setSyncing(!boolean(val));
+   if (val == 0) cp5.get(Toggle.class, "sync").setColorActive(color(#00ff00));
+   else cp5.get(Toggle.class, "sync").setColorActive(color(#ff0000));
 }
 long[] tmrs = new long[spot_ids.length];
 
 void checkConnection() {
 
   Client client = server.available();
-  
+
   for (int i = 0; i < spot_ids.length; i++) {
-      if (spots[i].spot != null &&(!spots[i].spot.active() || millis() - tmrs[i] >= 20000)) {
-        spots[i].spot.stop();
-        spots[i].spot = null;
-        println("Connection list: spot: ", spot_ids[i].getModuleID());
-      }
+    if (spots[i].spot != null &&(!spots[i].spot.active() || millis() - tmrs[i] >= 20000)) {
+      spots[i].spot.stop();
+      spots[i].spot = null;
+      println("Connection list: spot: ", spot_ids[i].getModuleID());
     }
+  }
 
   if (client != null) {
 
@@ -117,11 +118,13 @@ void checkConnection() {
           {
             spots[i].spot = client;
             println("Connected spot # ", i, client.ip());
+            if (i < 2) sp_left.updateSpot();
+            else sp_right.updateSpot();
           }
 
           tmrs[i] = millis();
           //print(i);
-          for (byte x : buf) print(int(x), ' ');
+          // for (byte x : buf) print(int(x), ' ');
 
           if (buf.length > 11) {
             //println(buf[10]);
