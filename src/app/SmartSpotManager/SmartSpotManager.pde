@@ -1,35 +1,30 @@
 import processing.net.*;
 import controlP5.*;
-import processing.sound.*;
-
-Server server;
-Client spotL;
 
 
 ControlP5 cp5;
 
-String portName;
-
-int potVal;
-int fillVal = 0;
-
-int speed = 115200;
-
-byte LEFT_ID = 10;
-byte RIGHT_ID = 12;
 
 
+Server server;
 
-// =========================================================================================
+// -----------------------------------------------------------------------------
 
-SpotVirtual sv1;
-SpotVirtual sv2;
-SpotGUI spg1;
-SpotGUI spg2;
+shs_ID[] spot_ids = {
+  new shs_ID(11, 0, 0),
+  new shs_ID(12, 0, 0),
+  new shs_ID(14, 0, 0),
+  new shs_ID(15, 0, 0) };
+SpotVirtual[] spots;
+
+SpotGUI sp_left, sp_right;
+
+// -----------------------------------------------------------------------------
 
 void setup() {
-
+  // ---------------------------------------------------------------------------
   size(1800, 900);
+
   cp5 = new ControlP5(this);
 
   cp5
@@ -40,24 +35,8 @@ void setup() {
     //  .setColorLabel(guiColors[5])
     //  .setColorValue(guiColors[6])
     //  .setColorValueLabel(guiColors[7])
-    .setFont(createFont("Calibri", 18))  // сделаем шрифт побольше
-    ;
 
-  server = new Server(this, 10002);
-
-
-  println("Server started: ", server.ip());
-
-
-  sv1 = new SpotVirtual(10);
-  sv2 = new SpotVirtual(12);
-  spg1 = new SpotGUI(this, 0, 0, sv1, "spg1");
-  spg2 = new SpotGUI(this, 900, 0, sv2, "spg2");
-
-
-
-  spg1.syncing = new SpotGUI[1];
-  spg1.syncing[0] = spg2;
+    .setFont(createFont("Calibri", 18));
 
   cp5
     .addToggle("sync")
@@ -67,86 +46,108 @@ void setup() {
     .setPosition(10, 100)
     .setSize(80, 30)
     .onChange(new CallbackListener() {
+
     public void controlEvent(CallbackEvent event) {
       s_sync(int(event.getController().getValue()));
     }
   }
   );
 
+  // ---------------------------------------------------------------------------
+
+  server = new Server(this, 10002);
+
+  println("Server started: ", server.ip());
+
+  // ---------------------------------------------------------------------------
+
+  spots = new SpotVirtual[spot_ids.length];
+  for (int i = 0; i < spot_ids.length; i++) spots[i] = new SpotVirtual(spot_ids[i]);
 
 
+  sp_left = new SpotGUI(this, 0, 0, "sp_left");
+  sp_right = new SpotGUI(this, 900, 0, "sp_right");
 
-  spg1.guiSetup();
-  spg2.guiSetup();
-  spg1.cp5.getController("spg1br_maxBr").setValue(210);
-  spg1.cp5.getController("spg1bright").setValue(0);
-  spg2.cp5.getController("spg2br_maxBr").setValue(210);
-  spg2.cp5.getController("spg2bright").setValue(0);
+  sp_left.virtual_spots = new SpotVirtual[2];
+  for (int i = 0; i < 2; i++) sp_left.virtual_spots[i] = spots[i];
 
-  newYearSetup();
+  sp_right.virtual_spots = new SpotVirtual[2];
+  for (int i = 0; i < 2; i++) sp_right.virtual_spots[i] = spots[2 + i];
+
+
+  sp_left.syncing = new SpotGUI[1];
+  //sp_left.syncing[0] = sp_right;
+
+  sp_left.guiSetup();
+  sp_right.guiSetup();
+  //   sp_left.cp5.getController("sp_leftbr_maxBr").setValue(210);
+  //   sp_left.cp5.getController("sp_leftbright").setValue(0);
+  //   sp_right.cp5.getController("sp_rightbr_maxBr").setValue(210);
+  //   sp_right.cp5.getController("sp_rightbright").setValue(0);
 }
 
-
-
-void s_sync(int val)
-{
-  println(val);
-  spg1.setSyncing(boolean(val));
+void s_sync(int val) {
+  //println(val);
+  //sp_left.setSyncing(boolean(val));
 }
+long[] tmrs = new long[spot_ids.length];
 
+void checkConnection() {
 
-long tmr1, tmr2 = 0;
-void checkConnection()
-{
+  Client client = server.available();
+  
+  for (int i = 0; i < spot_ids.length; i++) {
+      if (spots[i].spot != null &&(!spots[i].spot.active() || millis() - tmrs[i] >= 20000)) {
+        spots[i].spot.stop();
+        spots[i].spot = null;
+        println("Connection list: spot: ", spot_ids[i].getModuleID());
+      }
+    }
 
-  if (sv1.spot != null && (!sv1.spot.active() || millis() - tmr1 > 10000)) {
-    sv1.spot.stop();
-    sv1.spot = null;
-    println("Connection lost: LEFT_spot");
-  }
-  if (sv2.spot != null && (!sv2.spot.active() || millis() - tmr2 > 10000)) {
-    sv2.spot.stop();
-    sv2.spot = null;
-    println("Connection lost: RIGHT_spot");
-  }
+  if (client != null) {
 
+    if (client.available() > 0) {
+      byte buf[] = client.readBytes();
 
-  Client cl = server.available();
-  if (cl != null) {
-    if (cl.available() > 0) {
-      byte buf[] = cl.readBytes();
-      if (buf[1] == LEFT_ID) {
-        if (sv1.spot == null) {
-          sv1.spot = cl;
-          spg1.updateSpot();
-          println("Connected LEFT_spot:  ", cl.ip());
-        } else if (buf[0] == 4) {
-          spg1.setFan(int(buf[2]));
-          spg1.setTemp(int(buf[3]));
+      for (int i = 0; i < spot_ids.length; i++)
+      {
+        if (buf[5] == spot_ids[i].getModuleID())
+        {
+          if (spots[i].spot == null)
+          {
+            spots[i].spot = client;
+            println("Connected spot # ", i, client.ip());
+          }
+
+          tmrs[i] = millis();
+          //print(i);
+          for (byte x : buf) print(int(x), ' ');
+
+          if (buf.length > 11) {
+            //println(buf[10]);
+            switch(buf[10]) {
+            case 6:
+              if (i < 2) {
+                sp_left.setTemp(int(buf[11]), i + 1);
+                sp_left.setFan(int(buf[12]), i + 1);
+              } else {
+                sp_right.setTemp(int(buf[11]), i - 2 + 1);
+                sp_right.setFan(int(buf[12]), i - 2 + 1);
+              }
+              break;
+            }
+          }
         }
-        tmr1 = millis();
-      } else if (buf[1] == RIGHT_ID) {
-        if (sv2.spot == null) {
-          sv2.spot = cl;
-          spg2.updateSpot();
-          println("Connected RIGHT_spot: ", cl.ip());
-        } else if (buf[0] == 4) {
-          spg2.setFan(int(buf[2]));
-          spg2.setTemp(int(buf[3]));
-        }
-        tmr2 = millis();
       }
     }
   }
 }
 
-// ========================================================================================
+// -----------------------------------------------------------------------------
 
 void draw() {
-  AutoTime_tick();
-
   background(guiColors[0]);
   checkConnection();
-  spg1.tick();
-  spg2.tick();
+  sp_left.tick();
+  sp_right.tick();
 }
