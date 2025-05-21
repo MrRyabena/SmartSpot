@@ -21,6 +21,7 @@ shs::SmartSpot::SmartSpot(const shs::SmartSpotConfig& config)
     default: break;
 
     #ifdef SHS_SF_ESP32
+        analogReadResolution(10);
         ledcAttach(config.RED_PIN, config.PWM_FREQUENCY, 8);
         ledcAttach(config.GREEN_PIN, config.PWM_FREQUENCY, 8);
         ledcAttach(config.BLUE_PIN, config.PWM_FREQUENCY, 8);
@@ -58,20 +59,60 @@ void shs::SmartSpot::tick()
 void shs::SmartSpot::stop()
 {}
 
+#define SHS_SF_DEBUG
+#define DEBUG
+#include <shs_debug.h>
+
+uint8_t shs::SmartSpot::getTemperature()
+{
+    if (m_temp_sensor)
+    {
+
+        doutln(m_temp_sensor->getValueF());
+        doutln(m_temp_sensor->getStatus());
+
+        return static_cast< uint8_t >(m_temp_sensor->getValueF());
+
+    }
+    return 255;
+}
+
+uint8_t shs::SmartSpot::getSensorStatus()
+{
+    if (m_temp_sensor) return m_temp_sensor->getStatus();
+    return  254;
+}
+
+uint8_t shs::SmartSpot::getFanPower()
+{
+    if (m_fan) return m_fan->getValue();
+    return 0;
+}
+
+void shs::SmartSpot::setFan(const uint8_t value, const uint8_t mode)
+{
+    m_fan_mode = mode;
+    if (m_fan) m_fan->on(value);
+}
+
 
 void shs::SmartSpot::m_temperatureControl()
 {
+
+    if (m_temp_sensor && !m_temp_sensor->isUpdated()) m_temp_sensor->update();
     if (m_timer.check())
     {
+
         auto fan_power = 255;
         if (m_temp_sensor)
         {
-            m_temp_sensor->updateFast();
+           // m_temp_sensor->updateFast();
 
-            fan_power = map(m_temp_sensor->getValueI(), m_config.MIN_TEMP, m_config.MAX_TEMP, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
-            fan_power = constrain(fan_power, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
+            // fan_power = map(m_temp_sensor->getValueI(), m_config.MIN_TEMP, m_config.MAX_TEMP, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
+            // fan_power = constrain(fan_power, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
+            fan_power = (m_temp_sensor->getValueI() >= m_config.MIN_TEMP ? 255 : 0);
         }
 
-        if (m_fan) m_fan->on(fan_power);
+        if (!m_fan_mode) if (m_fan) m_fan->on(fan_power);
     }
 }

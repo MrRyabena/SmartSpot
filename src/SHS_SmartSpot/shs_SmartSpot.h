@@ -49,6 +49,11 @@ public:
 
     std::shared_ptr<GRGB> getGRGB() { return m_chip; }
 
+    uint8_t getTemperature();
+    uint8_t getSensorStatus();
+    uint8_t getFanPower();
+    void setFan(uint8_t value, uint8_t mode = 0);
+
 
 protected:
     static constexpr auto m_CONTROL_TIMEOUT = 2000;
@@ -84,6 +89,8 @@ protected:
     }
     const m_config
         ;
+    
+    uint8_t m_fan_mode{};
 
 
     void m_temperatureControl();
