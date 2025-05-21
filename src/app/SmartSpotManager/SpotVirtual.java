@@ -4,9 +4,30 @@ import processing.net.Client;
 class SpotVirtual {
   shs_ID id;
   Client spot;
+  byte r, g, b;
+  byte brightness;
+
+
+  int color_power = 17;
+
+  int max_power;
+  int max_brightness;
 
   SpotVirtual(shs_ID set_ID) {
     this.id = set_ID;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.brightness = 0;
+  }
+
+  SpotVirtual(shs_ID set_ID, int max_power, int max_brightness) {
+    this.id = set_ID;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.max_power = max_power;
+    this.max_brightness = max_brightness;
   }
 
   void m_send(byte[] data) {
@@ -33,14 +54,14 @@ class SpotVirtual {
     for (int i = 0; i < data.length; i++)
       buf[OFFSET + i] = data[i];
 
-    if (spot != null)
-      spot.write(buf);
+    if (spot != null) spot.write(buf);
 
   //for (int i = 0; i < buf.length; i++) System.out.print((int)buf[i]); System.out.println();
 
   }
 
-  void requestTemperature() {
+  void requestTemperature() 
+  {
     byte[] buf = new byte[1];
 
     buf[0] = 4;
@@ -68,8 +89,9 @@ class SpotVirtual {
   void setBright(int val) {
     byte buf[] = new byte[2];
 
+    brightness = (byte) (val < max_brightness ? val : max_brightness);
     buf[0] = 13;
-    buf[1] |= val;
+    buf[1] |= brightness;
 
     m_send(buf);
   }
@@ -77,11 +99,18 @@ class SpotVirtual {
   void setColor(int r, int g, int b) {
     byte[] buf = new byte[5];
 
+    this.r = (byte) r;
+    this.g = (byte) g;
+    this.b = (byte) b;
+
+    int power = (r + g + b) / 255 * color_power;
+    power = power < max_power ? power : max_power;
+
     buf[0] = 3;
     buf[1] |= r;
     buf[2] |= g;
     buf[3] |= b;
-    buf[4] |= 255;
+    buf[4] |= (byte) power;    
 
     m_send(buf);
   }
