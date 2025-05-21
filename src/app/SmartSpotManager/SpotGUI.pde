@@ -54,6 +54,10 @@ public class SpotGUI {
     val = int(cp5.get(Slider.class, panel_name + "fd_time").getValue());
     for (SpotVirtual spot : virtual_spots) spot.setFadePeriod(val);
 
+    // set fan
+    val = int(cp5.get(Toggle.class, panel_name + "fan_b").getValue());
+    for (SpotVirtual spot : virtual_spots) spot.setCooling((byte)(val != 0 ? 255 : 0));
+
     // set music
     //for (SpotVirtual spot : virtual_spots) spot.setMusicEffect(byte(cp5.getController(panel_name + "RGBmusic").getValue()));
     //va_gui.update();
@@ -227,6 +231,18 @@ public class SpotGUI {
     if (!flag_brOFF) flag_brON = true;
   }
 
+    void setFadeMode(int mode) 
+    {
+      for (SpotVirtual spot : virtual_spots) spot.setFadeMode(mode);
+      if (syncing_flag) for (SpotGUI x : syncing) for (SpotVirtual spot : x.virtual_spots) spot.setFadeMode(mode);
+    }
+
+    void setFadePeriod(int period)
+    {
+      for (SpotVirtual spot : virtual_spots) spot.setFadePeriod(period);
+      if (syncing_flag) for (SpotGUI x : syncing) for (SpotVirtual spot : x.virtual_spots) spot.setFadePeriod(period);
+    }
+
   /*
    * -----------------Effects----------------
       */
@@ -321,8 +337,7 @@ public class SpotGUI {
     if (val == 1) cp5.get(Toggle.class, panel_name + "fade").setColorActive(color(#00ff00));
     else cp5.get(Toggle.class, panel_name + "fade").setColorActive(color(#ff0000));
 
-    for (SpotVirtual spot : virtual_spots) spot.setFadeMode(int(val));
-    if (syncing_flag) for (SpotGUI x : syncing) for (SpotVirtual spot : x.virtual_spots) spot.setFadeMode(int(val));
+    setFadeMode(int(val));
   }
 
   void handle_ef_fire_toggle(CallbackEvent event)
@@ -417,6 +432,28 @@ public class SpotGUI {
     }
   }
 
+  boolean flag_rc = false;
+  long tmr_rc;
+  void RandomColor_tick()
+  {
+    if (flag_rc && millis() - tmr_rc >= cp5.get(Slider.class, panel_name + "rc_speed").getValue()) {
+      
+      colorMode(HSB, 255, 255, 255);
+
+      for (SpotVirtual spot : virtual_spots) 
+      {
+        int H = int(random(0, 255));
+        color col = color(H, 255, 255);
+        spot.setColor(int(red(col)), int(green(col)), int(blue(col)));
+      }
+
+      colorMode(RGB);
+      
+      tmr_rc = millis();
+    }
+  }
+
+
   void handle_fan_toggle(CallbackEvent event)
   {
     int val = int(event.getController().getValue());
@@ -439,6 +476,7 @@ public class SpotGUI {
     ef_tick();
     fire_tick();
     info_tick();
+    RandomColor_tick();
   }
 
   /*
@@ -563,6 +601,7 @@ public class SpotGUI {
       .addColorWheel(panel_name + "picker", 480 + int(shift_x), 10 + int(shift_y), 400)
       .setCaptionLabel("")
       .setValue(0)
+      .setRGB(color(0, 0, 0))      
       .onClick(new CallbackListener() {
       public void controlEvent(CallbackEvent event) {
         handlePicker(event);
@@ -605,6 +644,28 @@ public class SpotGUI {
       .setSize(20, 350)
       .setRange(0, 255)
       .lock()
+      ;
+
+      cp5
+        .addButton(panel_name + "SP_1")
+        .setCaptionLabel("")
+        .setPosition(230 + shift_x,380 + shift_y)
+        .setSize(30, 30)
+        .setColorBackground(#000000)
+        .setColorForeground(#000000)
+        .setColorActive(#000000)
+        .lock()
+      ;
+
+       cp5
+        .addButton(panel_name + "SP_2")
+        .setCaptionLabel("")
+        .setPosition(300 + shift_x, 380 + shift_y)
+        .setSize(30, 30)
+        .setColorBackground(#000000)
+        .setColorForeground(#000000)
+        .setColorActive(#000000)
+        .lock()
       ;
 
     cp5
@@ -769,6 +830,56 @@ public class SpotGUI {
     )
     ;
 
+    cp5
+      .addToggle(panel_name + "RandomColor")
+      .setCaptionLabel("Random Color")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(10 + shift_x, 770 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        flag_rc = !flag_rc;
+        if (flag_rc) {
+          setFadeMode(1);
+          setFadePeriod(int(cp5.get(Slider.class, panel_name + "rc_speed").getValue() / 4));
+          cp5.get(Toggle.class, panel_name + "RandomColor").setColorActive(color(#00ff00)); 
+        } else {
+          updateSpot();
+          cp5.get(Toggle.class, panel_name + "RandomColor").setColorActive(color(#ff0000));
+        }
+      }
+    }
+    )
+    ;
+
+    cp5
+      .addSlider(panel_name + "rc_speed_2")
+      .setCaptionLabel("speed")
+      .setPosition(100 + shift_x, 770 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 1000)
+      .setValue(200)
+      .onChange(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        int val = int(event.getController().getValue());
+        cp5.get(Slider.class, panel_name + "rc_speed").setValue(val);
+      }
+    }
+    );
+
+
+    cp5
+      .addSlider(panel_name + "rc_speed")
+      .setCaptionLabel("speed")
+      .setPosition(100 + shift_x, 820 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 10000)
+      .setValue(200)
+    ;
+    
+
 
     cp5
       .addToggle(panel_name + "fan_b")
@@ -812,6 +923,9 @@ public class SpotGUI {
     { color(#0000ff), color(#0000B4) },
     { color(#00ffff), color(#00B4B3) },
     { color(#A020F0), color(#7819B4) },
+    { color(#000000), color(#000000) },
+    { color(#FAEBD7), color(#FAEBD7) },
+    { color(#DCFFFF), color(#DCFFFF) }
     }
     ;
 
@@ -821,7 +935,7 @@ public class SpotGUI {
     String names[] =
       {
       "b_red", "b_pink", "b_deep_pink", "b_yellow", "b_orange", "b_white",
-      "b_green", "b_light_green", "b_blue_green", "b_blue", "b_cyan", "b_purpure"
+      "b_green", "b_light_green", "b_blue_green", "b_blue", "b_cyan", "b_purpure", "b_black", "b_cold", "b_warm"
       }
       ;
 
