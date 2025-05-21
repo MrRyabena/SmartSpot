@@ -14,20 +14,20 @@ color[] guiColors = {
 
 public class SpotGUI
 {
-  SpotVirtual spot_virtual;
-  String pannel_name;
+  SpotVirtual[] virtual_spots;
+  String panel_name;
   float shift_x;
   float shift_y;
   ControlP5 cp5;
   SpotGUI[] syncing;
   boolean syncing_flag;
+  PApplet parent;
 
-  public SpotGUI(float x, float y, SpotVirtual spot, ControlP5 cp, String pannel_name)
+  public SpotGUI(float x, float y, ControlP5 cp, String panel_name)
   {
     this.shift_x = x;
     this.shift_y = y;
-    this.pannel_name = pannel_name;
-    this.spot_virtual = spot;
+    this.panel_name = panel_name;
     this.cp5 = cp;
     this.syncing_flag = false;
   }
@@ -44,19 +44,19 @@ public class SpotGUI
 
   void updateColorRGB(color col) {
 
-    cp5.get(Slider.class, pannel_name + "R").setValue(red(col)).setColorForeground(color(red(col), 0, 0)).setColorActive(color(red(col), 0, 0));
-    cp5.get(Slider.class, pannel_name + "G").setValue(green(col)).setColorForeground(color(0, green(col), 0)).setColorActive(color(0, green(col), 0));
-    cp5.get(Slider.class, pannel_name + "B").setValue(blue(col)).setColorForeground(color(0, 0, blue(col))).setColorActive(color(0, 0, blue(col)));
-    spot_virtual.setColor(col);
+    cp5.get(Slider.class, panel_name + "R").setValue(red(col)).setColorForeground(color(red(col), 0, 0)).setColorActive(color(red(col), 0, 0));
+    cp5.get(Slider.class, panel_name + "G").setValue(green(col)).setColorForeground(color(0, green(col), 0)).setColorActive(color(0, green(col), 0));
+    cp5.get(Slider.class, panel_name + "B").setValue(blue(col)).setColorForeground(color(0, 0, blue(col))).setColorActive(color(0, 0, blue(col)));
+    for (int i = 0; i < spot_virtual.length; i++) spot_virtual[i].setColor(col);
 
   }
 
   void updateColorPicker(color col) {
-    cp5.get(ColorWheel.class, pannel_name + "picker").setRGB(col);
+    cp5.get(ColorWheel.class, panel_name + "picker").setRGB(col);
   }
 
   void handlePicker(CallbackEvent event) {
-    color col = color(cp5.get(ColorWheel.class, pannel_name + "picker").getRGB());
+    color col = color(cp5.get(ColorWheel.class, panel_name + "picker").getRGB());
     setColor(col);
   }
 
@@ -73,23 +73,23 @@ public class SpotGUI
 
 void setBright(int val)
 {
-    cp5.get(Knob.class, pannel_name + "bright").setValue(val);
+    cp5.get(Knob.class, panel_name + "bright").setValue(val);
 }
 
 void updateBrightSpot(int val) {
   
-  int out =  int(cp5.get(Slider.class, pannel_name + "br_maxBr").getValue());
+  int out =  int(cp5.get(Slider.class, panel_name + "br_maxBr").getValue());
   if (val <= out) out = val;
   
  
-  if (int(cp5.get(Toggle.class, pannel_name + "switch_b").getValue()) == 0) out = 0;
+  if (int(cp5.get(Toggle.class, panel_name + "switch_b").getValue()) == 0) out = 0;
 
   
-  if (spot_virtual != null) spot_virtual.setBright(out);
+  for (int i = 0; i < spot_virtual.length; i++) spot_virtual[i].setBright(out);
 }
 
 void updateBrightMaxBr(int val) {
-  cp5.get(Slider.class, pannel_name + "br_maxBr").setValue(float(val));
+  cp5.get(Slider.class, panel_name + "br_maxBr").setValue(float(val));
 }
 
 void handleBright(CallbackEvent event) {
@@ -103,9 +103,9 @@ boolean flag_brOFF = false;
 long tmr_brOFF = millis();
 void brightOFF() {  
   if (flag_brOFF) 
-    if (millis() - tmr_brOFF >= cp5.get(Slider.class, pannel_name + "br_speed").getValue()) {
-      int val = min(int(cp5.get(Knob.class, pannel_name + "bright").getValue()) - 1, int(cp5.get(Slider.class, pannel_name + "br_maxBr").getValue()));
-      cp5.get(Knob.class, pannel_name + "bright").setValue(val);
+    if (millis() - tmr_brOFF >= cp5.get(Slider.class, panel_name + "br_speed").getValue()) {
+      int val = min(int(cp5.get(Knob.class, panel_name + "bright").getValue()) - 1, int(cp5.get(Slider.class, panel_name + "br_maxBr").getValue()));
+      cp5.get(Knob.class, panel_name + "bright").setValue(val);
       if (val <= 0) flag_brOFF = false;
       tmr_brOFF = millis();
     }
@@ -115,10 +115,10 @@ boolean flag_brON = false;
 long tmr_brON = millis();
 void brightON() {  
   if (flag_brON)
-    if (millis() - tmr_brON >= cp5.get(Slider.class, pannel_name + "br_speed").getValue()) {
-      int val  = int(cp5.get(Knob.class, pannel_name + "bright").getValue()) + 1;
-      cp5.get(Knob.class, pannel_name + "bright").setValue(val);
-      if (val >= int(cp5.get(Slider.class, pannel_name + "br_maxBr").getValue())) flag_brON = false;
+    if (millis() - tmr_brON >= cp5.get(Slider.class, panel_name + "br_speed").getValue()) {
+      int val  = int(cp5.get(Knob.class, panel_name + "bright").getValue()) + 1;
+      cp5.get(Knob.class, panel_name + "bright").setValue(val);
+      if (val >= int(cp5.get(Slider.class, panel_name + "br_maxBr").getValue())) flag_brON = false;
       tmr_brON = millis();
     }
 }
@@ -128,10 +128,10 @@ void handle_switch_b(CallbackEvent event) {
   int val = int(event.getController().getValue());
 
   if (val == 1) {
-    set_val = int(cp5.get(Knob.class, pannel_name + "bright").getValue());
-    cp5.get(Toggle.class, pannel_name + "switch_b").setColorActive(color(#00ff00));
+    set_val = int(cp5.get(Knob.class, panel_name + "bright").getValue());
+    cp5.get(Toggle.class, panel_name + "switch_b").setColorActive(color(#00ff00));
   } else {
-    cp5.get(Toggle.class, pannel_name + "switch_b").setColorActive(color(#ff0000));
+    cp5.get(Toggle.class, panel_name + "switch_b").setColorActive(color(#ff0000));
   }
   
   updateBrightSpot(set_val);
@@ -160,9 +160,9 @@ boolean flag_sp = false;
 long tmr_sp;
 int sp_br = 0;
 void ef_splash() {
-  if (flag_sp && millis() - tmr_sp >= cp5.get(Slider.class, pannel_name + "sp_speed").getValue()) {
+  if (flag_sp && millis() - tmr_sp >= cp5.get(Slider.class, panel_name + "sp_speed").getValue()) {
     sp_br = sp_br == 0 ? 0xff : 0;
-    cp5.get(Knob.class, pannel_name + "bright").setValue(sp_br);
+    cp5.get(Knob.class, panel_name + "bright").setValue(sp_br);
     tmr_sp = millis();
   }
 }
@@ -170,11 +170,11 @@ void ef_splash() {
 void handle_ef_splash_toggle(CallbackEvent event) {
    int val = int(event.getController().getValue());
   if (val == 1) {
-    cp5.get(Toggle.class, pannel_name + "splash").setColorActive(color(#00ff00));
+    cp5.get(Toggle.class, panel_name + "splash").setColorActive(color(#00ff00));
     flag_sp = true;
   } else {
     flag_sp = false;
-    cp5.get(Toggle.class, pannel_name + "splash").setColorActive(color(#ff0000));
+    cp5.get(Toggle.class, panel_name + "splash").setColorActive(color(#ff0000));
   }
 }
 
@@ -182,7 +182,7 @@ boolean flag_sh = false;
 long tmr_sh;
 color col_sh;
 void ef_shift() {
-  if (flag_sh && millis() - tmr_sh >= cp5.get(Slider.class, pannel_name + "sh_speed").getValue()) {
+  if (flag_sh && millis() - tmr_sh >= cp5.get(Slider.class, panel_name + "sh_speed").getValue()) {
     colorMode(HSB, 255, 255, 255);
     int H = int(hue(col_sh) + 129);
     H %= 255;
@@ -197,11 +197,11 @@ void ef_shift() {
 void handle_ef_shift_toggle(CallbackEvent event) {
     int val = int(event.getController().getValue());
   if (val == 1) {
-    cp5.get(Toggle.class, pannel_name + "shift").setColorActive(color(#00ff00));
+    cp5.get(Toggle.class, panel_name + "shift").setColorActive(color(#00ff00));
     flag_sh = true;
   } else {
     flag_sh = false;
-    cp5.get(Toggle.class, pannel_name + "shift").setColorActive(color(#ff0000));
+    cp5.get(Toggle.class, panel_name + "shift").setColorActive(color(#ff0000));
   }
 }
 
@@ -210,7 +210,7 @@ boolean flag_wl = false;
 long tmr_wl;
 int H_wl;
 void ef_wheel() {
-  if (flag_wl && millis() - tmr_wl >= cp5.get(Slider.class, pannel_name + "wl_speed").getValue()) {
+  if (flag_wl && millis() - tmr_wl >= cp5.get(Slider.class, panel_name + "wl_speed").getValue()) {
     colorMode(HSB, 255, 255, 255);
     H_wl++;
     H_wl %= 255;
@@ -225,29 +225,29 @@ void ef_wheel() {
 void handle_ef_wheel_toggle(CallbackEvent event) {
     int val = int(event.getController().getValue());
   if (val == 1) {
-    cp5.get(Toggle.class, pannel_name + "wheel").setColorActive(color(#00ff00));
+    cp5.get(Toggle.class, panel_name + "wheel").setColorActive(color(#00ff00));
     flag_wl = true;
   } else {
     flag_wl = false;
-    cp5.get(Toggle.class, pannel_name + "wheel").setColorActive(color(#ff0000));
+    cp5.get(Toggle.class, panel_name + "wheel").setColorActive(color(#ff0000));
   }
 }
 
 void handle_ef_fade_toggle(CallbackEvent event)
 {
      int val = int(event.getController().getValue());
-  if (val == 1) cp5.get(Toggle.class, pannel_name + "fade").setColorActive(color(#00ff00));
-  else cp5.get(Toggle.class, pannel_name + "fade").setColorActive(color(#ff0000));
+  if (val == 1) cp5.get(Toggle.class, panel_name + "fade").setColorActive(color(#00ff00));
+  else cp5.get(Toggle.class, panel_name + "fade").setColorActive(color(#ff0000));
   
-  spot_virtual.setFadeMode(boolean(val));
-  if (syncing_flag) for (SpotGUI x : syncing) x.spot_virtual.setFadeMode(boolean(val));
+  for (int i = 0; i < spot_virtual.length; i++) spot_virtual[i].setFadeMode(boolean(val));
+  if (syncing_flag) for (SpotGUI x : syncing) for (int i = 0; i < x.spot_virtual.length; i++) x.spot_virtual[i].setFadeMode(boolean(val));
 }
 
 void handle_ef_fire_toggle(CallbackEvent event)
 {
    int val = int(event.getController().getValue());
-   if (val == 1) { cp5.get(Toggle.class, pannel_name + "fire").setColorActive(color(#00ff00)); flag_fr = true; }
-   else { cp5.get(Toggle.class, pannel_name + "fire").setColorActive(color(#ff0000)); flag_fr = false; }
+   if (val == 1) { cp5.get(Toggle.class, panel_name + "fire").setColorActive(color(#00ff00)); flag_fr = true; }
+   else { cp5.get(Toggle.class, panel_name + "fire").setColorActive(color(#ff0000)); flag_fr = false; }
   
 }
 
@@ -312,21 +312,21 @@ void tick()
 
 void setFan(int fan)
  {
-   cp5.get(Slider.class, pannel_name + "fan").setValue(float(fan));
+   cp5.get(Slider.class, panel_name + "fan").setValue(float(fan));
  }
  
  void setTemp(int temp)
  {
    colorMode(HSB);
-   cp5.get(Slider.class, pannel_name + "temp").setValue(float(temp))
-        .setColorForeground(color(100 - map(cp5.get(Slider.class, pannel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255))
-        .setColorActive(color(100 - map(cp5.get(Slider.class, pannel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255));
+   cp5.get(Slider.class, panel_name + "temp").setValue(float(temp))
+        .setColorForeground(color(100 - map(cp5.get(Slider.class, panel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255))
+        .setColorActive(color(100 - map(cp5.get(Slider.class, panel_name + "temp").getValue(), 20, 50, 0, 100), 255, 255));
    colorMode(RGB);
  }
   void guiSetup() {
 
     cp5
-      .addToggle(pannel_name + "switch_b")
+      .addToggle(panel_name + "switch_b")
       .setCaptionLabel("switch")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -345,7 +345,7 @@ void setFan(int fan)
 
 
     cp5
-      .addKnob(pannel_name + "bright")
+      .addKnob(panel_name + "bright")
       .setCaptionLabel("brightness")
       .setRange(0, 255)
       .setRadius(70)
@@ -362,7 +362,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addButton(pannel_name + "br_off")
+      .addButton(panel_name + "br_off")
       .setCaptionLabel("off")
       .setPosition(10 + shift_x, 320 + shift_y)
       .setSize(50, 30)
@@ -376,7 +376,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addButton(pannel_name + "br_on")
+      .addButton(panel_name + "br_on")
       .setCaptionLabel("on")
       .setPosition(100 + shift_x, 320 + shift_y)
       .setSize(50, 30)
@@ -390,7 +390,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addSlider(pannel_name + "br_speed")
+      .addSlider(panel_name + "br_speed")
       .setCaptionLabel("speed")
       .setPosition(10 + shift_x, 370 + shift_y)
       .setSize(140, 30)
@@ -399,7 +399,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "br_maxBr")
+      .addSlider(panel_name + "br_maxBr")
       .setCaptionLabel("Max Brightness")
       .setPosition(10 + shift_x, 420 + shift_y)
       .setSize(140, 30)
@@ -408,7 +408,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addColorWheel(pannel_name + "picker", 480 + int(shift_x), 10 + int(shift_y), 400)
+      .addColorWheel(panel_name + "picker", 480 + int(shift_x), 10 + int(shift_y), 400)
       .setCaptionLabel("")
       .onClick(new CallbackListener() {
       public void controlEvent(CallbackEvent event) {
@@ -419,7 +419,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "temp")
+      .addSlider(panel_name + "temp")
       .setCaptionLabel("temperature")
       .setPosition(250 + shift_x, 10 + shift_y)
       .setSize(40, 350)
@@ -428,7 +428,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addSlider(pannel_name + "fan")
+      .addSlider(panel_name + "fan")
       .setCaptionLabel("fan")
       .setPosition(400 + shift_x, 10 + shift_y)
       .setSize(40, 350)
@@ -437,7 +437,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addToggle(pannel_name + "splash")
+      .addToggle(panel_name + "splash")
       .setCaptionLabel("splash")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -453,7 +453,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "sp_speed")
+      .addSlider(panel_name + "sp_speed")
       .setCaptionLabel("speed")
       .setPosition(100 + shift_x, 470 + shift_y)
       .setSize(300, 30)
@@ -462,7 +462,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addToggle(pannel_name + "shift")
+      .addToggle(panel_name + "shift")
       .setCaptionLabel("shift")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -478,7 +478,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "sh_speed")
+      .addSlider(panel_name + "sh_speed")
       .setCaptionLabel("speed")
       .setPosition(100 + shift_x, 520 + shift_y)
       .setSize(300, 30)
@@ -488,7 +488,7 @@ void setFan(int fan)
 
 
     cp5
-      .addToggle(pannel_name + "wheel")
+      .addToggle(panel_name + "wheel")
       .setCaptionLabel("wheel")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -504,7 +504,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "wl_speed")
+      .addSlider(panel_name + "wl_speed")
       .setCaptionLabel("speed")
       .setPosition(100 + shift_x, 570 + shift_y)
       .setSize(300, 30)
@@ -513,7 +513,7 @@ void setFan(int fan)
     ;
     
     cp5
-      .addToggle(pannel_name + "fade")
+      .addToggle(panel_name + "fade")
       .setCaptionLabel("fade")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -529,7 +529,7 @@ void setFan(int fan)
     ;
 
     cp5
-      .addSlider(pannel_name + "fd_time")
+      .addSlider(panel_name + "fd_time")
       .setCaptionLabel("fade T")
       .setPosition(100 + shift_x, 620 + shift_y)
       .setSize(300, 30)
@@ -538,15 +538,15 @@ void setFan(int fan)
       .onClick(new CallbackListener() {
       public void controlEvent(CallbackEvent event) {
         int T = int(event.getController().getValue());
-        spot_virtual.setFadePeriod(T);
-        if (syncing_flag) for (SpotGUI x : syncing) x.spot_virtual.setFadePeriod(T);
+        for (int i = 0; i < spot_virtual.length; i++) spot_virtual[i].setFadePeriod(T);
+        if (syncing_flag) for (SpotGUI x : syncing) for (int i = 0; i < x.spot_virtual.length; i++) x.spot_virtual[i].setFadePeriod(T);
       }
       }
       )
   ;
   
   cp5
-      .addToggle(pannel_name + "fire")
+      .addToggle(panel_name + "fire")
       .setCaptionLabel("fire")
       .setValue(false)
       .setMode(ControlP5.SWITCH)
@@ -596,7 +596,7 @@ void setFan(int fan)
     for (int i = 0; i < names.length; i++)
     {
       cp5
-        .addButton(pannel_name + names[i])
+        .addButton(panel_name + names[i])
         .setCaptionLabel("")
         .setPosition(480 + x + shift_x, 550 + y + shift_y)
         .setSize(30, 30)
@@ -623,7 +623,7 @@ void setFan(int fan)
 
 
     cp5
-      .addSlider(pannel_name + "R")
+      .addSlider(panel_name + "R")
       .setCaptionLabel("R")
       .setPosition(670 + shift_x, 550 + shift_y)
       .setSize(200, 30)
@@ -632,7 +632,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addSlider(pannel_name + "G")
+      .addSlider(panel_name + "G")
       .setCaptionLabel("G")
       .setPosition(670 + shift_x, 600 + shift_y)
       .setSize(200, 30)
@@ -641,7 +641,7 @@ void setFan(int fan)
       ;
 
     cp5
-      .addSlider(pannel_name + "B")
+      .addSlider(panel_name + "B")
       .setCaptionLabel("B")
       .setPosition(670 + shift_x, 650 + shift_y)
       .setSize(200, 30)

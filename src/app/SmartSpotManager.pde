@@ -56,8 +56,15 @@ void setup() {
   sv_l2 = new SpotVirtual(LEFT_ID_2);
   sv_r1 = new SpotVirtual(RIGHT_ID_1);
   sv_r2 = new SpotVirtual(RIGHT_ID_2);
-  spg1 = new SpotGUI(0, 0, sv_l1, cp5, "spg1");
-  spg2 = new SpotGUI(900, 0,sv_r1, cp5, "spg2");
+  spg1 = new SpotGUI(0, 0, cp5, "spg1");
+  spg1.spot_virtual = new SpotVirtual[2];
+  spg1.spot_virtual[0] = sv_l1;
+  spg1.spot_virtual[1] = sv_l2;
+  
+  spg2 = new SpotGUI(900, 0, cp5, "spg2");
+  spg2.spot_virtual = new SpotVirtual[2];
+  spg2.spot_virtual[0] = sv_r1;
+  spg2.spot_virtual[1] = sv_r2;
   
   spg1.syncing = new SpotGUI[2];
   spg1.syncing[0] = spg2;
@@ -79,6 +86,7 @@ void setup() {
 void sync(int val)
 {
  spg1.syncing_flag = !boolean(val); 
+ //spg2.syncing_flag = !boolean(val); 
 }
 
 
@@ -87,9 +95,9 @@ void checkConnection()
 {
   
   //if (sv_l1.spot != null && (!sv_l1.spot.active() || millis() - tmr1 > 10000)) { sv_l1.spot.stop(); sv_l1.spot = null; println("Connection lost: LEFT_1"); }
-  if (sv_r1.spot != null && (!sv_r1.spot.active() || millis() - tmr2 > 10000)) { sv_r1.spot.stop(); sv_r1.spot = null; println("Connection lost: RIGHT_1"); }
-    if (sv_l2.spot != null && (!sv_l2.spot.active() || millis() - tmr3 > 10000)) { sv_l2.spot.stop(); sv_l2.spot = null; println("Connection lost: LEFT_2"); }
-  if (sv_r2.spot != null && (!sv_r2.spot.active() || millis() - tmr4 > 10000)) { sv_r2.spot.stop(); sv_r2.spot = null; println("Connection lost: RIGHT_2"); }
+  //if (sv_r1.spot != null && (!sv_r1.spot.active() || millis() - tmr2 > 10000)) { sv_r1.spot.stop(); sv_r1.spot = null; println("Connection lost: RIGHT_1"); }
+   // if (sv_l2.spot != null && (!sv_l2.spot.active() || millis() - tmr3 > 10000)) { sv_l2.spot.stop(); sv_l2.spot = null; println("Connection lost: LEFT_2"); }
+  //if (sv_r2.spot != null && (!sv_r2.spot.active() || millis() - tmr4 > 10000)) { sv_r2.spot.stop(); sv_r2.spot = null; println("Connection lost: RIGHT_2"); }
   
   Client cl = server.available();
   if (cl != null) {
@@ -98,7 +106,8 @@ void checkConnection()
     
     int index = 5; // 3;
     
-    for (int i = 0; i < buf.length; i++) println(buf[i]);
+   // for (int i = 0; i < buf.length; i++) println(buf[i]);
+   
 
     if (buf[index] == LEFT_ID_1){
       if (sv_l1.spot == null) { sv_l1.spot = cl; println("Connected spot LEFT_1:  ", cl.ip()); }
