@@ -112,8 +112,8 @@ void checkConnection() {
       spots[i].spot.stop();
       spots[i].spot = null;
       
-      if (i < 2) { sp_left.cp5.getController("sp_leftSP_" + i % 2).setColorBackground(#ff0000); }
-      else { sp_right.cp5.getController("sp_rightSP_" + i % 2).setColorBackground(#ff0000); }
+      if (i < 2) { sp_left.setSP(i % 2, false); }
+      else { sp_right.setSP(i % 2, false); }
 
       println("Connection list: spot: ", spot_ids[i].getModuleID());
     }
@@ -137,10 +137,12 @@ void checkConnection() {
           }
 
           tmrs[i] = millis();
-          println("sp_leftSP_" + str(i % 2));
-          //if (i < 2) { println(cp5.get(Button.class, "sp_leftSP_" + i % 2)); } //.setColorActive(color(#00ff00)); }//.setColorBackground(); }
-          //else { cp5.get(Button.class, "sp_rightSP_" + i % 2).setColorActive(color(#00ff00)); }
-          
+
+          if (i < 2) { sp_left.setSP(i % 2, true); } 
+          else { sp_right.setSP(i % 2, true); }
+
+
+
           //print(i);
           // for (byte x : buf) print(int(x), ' ');
 

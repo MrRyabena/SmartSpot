@@ -513,6 +513,12 @@ public class SpotGUI {
 
   }
 
+  void setSP(int ind, boolean flag)
+  {
+    if (flag) cp5.get(Button.class, panel_name + "SP_" + str(ind)).setColorBackground(color(#00ff00));
+    else cp5.get(Button.class, panel_name + "SP_" + str(ind)).setColorBackground(color(#ff0000));
+  }
+
   void guiSetup() {
 
     cp5
@@ -645,7 +651,7 @@ public class SpotGUI {
       .setRange(0, 255)
       .lock()
       ;
-
+      println(panel_name + "SP_0");
       cp5
         .addButton(panel_name + "SP_0")
         .setCaptionLabel("")
