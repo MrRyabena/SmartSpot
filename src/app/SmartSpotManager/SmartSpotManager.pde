@@ -20,8 +20,8 @@ shs_ID[] spot_ids = {
 int[][] spot_pb = {
   {35, 255},                         // miluta
   {35, 255},                         //
-  {35, 255},                         // left (new)
-  {35, 255}                          // right (old)
+  {35, 240},                         // left (new)
+  {35, 180}                          // right (old)
 };
 
 
