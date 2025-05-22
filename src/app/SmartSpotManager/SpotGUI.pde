@@ -647,7 +647,7 @@ public class SpotGUI {
       ;
 
       cp5
-        .addButton(panel_name + "SP_1")
+        .addButton(panel_name + "SP_0")
         .setCaptionLabel("")
         .setPosition(230 + shift_x,380 + shift_y)
         .setSize(30, 30)
@@ -658,14 +658,14 @@ public class SpotGUI {
       ;
 
        cp5
-        .addButton(panel_name + "SP_2")
+        .addButton(panel_name + "SP_1")
         .setCaptionLabel("")
         .setPosition(300 + shift_x, 380 + shift_y)
         .setSize(30, 30)
         .setColorBackground(#000000)
         .setColorForeground(#000000)
         .setColorActive(#000000)
-        .lock()
+        //.lock()
       ;
 
     cp5

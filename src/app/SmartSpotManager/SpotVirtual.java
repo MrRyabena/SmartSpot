@@ -110,7 +110,7 @@ class SpotVirtual {
     buf[1] |= r;
     buf[2] |= g;
     buf[3] |= b;
-    buf[4] |= (byte) power;    
+    buf[4] |= 255; //(byte) power;    
 
     m_send(buf);
   }

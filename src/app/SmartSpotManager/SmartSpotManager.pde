@@ -11,16 +11,17 @@ Server server;
 // -----------------------------------------------------------------------------
 
 shs_ID[] spot_ids = {
-  new shs_ID(11, 0, 0),
-  new shs_ID(12, 0, 0),
-  new shs_ID(14, 0, 0),
-  new shs_ID(15, 0, 0) }; 
+  new shs_ID(11, 0, 0),              // miluta
+  new shs_ID(12, 0, 0),              // 
+  new shs_ID(14, 0, 0),              // left (new)
+  new shs_ID(15, 0, 0)               // right (old) 
+};       
 
 int[][] spot_pb = {
-  {50, 255},
-  {50, 255},
-  {50, 255},
-  {50, 255}
+  {35, 255},                         // miluta
+  {35, 255},                         //
+  {35, 255},                         // left (new)
+  {35, 255}                          // right (old)
 };
 
 
@@ -111,8 +112,8 @@ void checkConnection() {
       spots[i].spot.stop();
       spots[i].spot = null;
       
-      if (i < 2) { cp5.get(Button.class, "sp_leftSP_" + i).setColorBackground(#ff0000); }
-      else { cp5.get(Button.class, "sp_rightSP_" + i).setColorBackground(#ff0000); }
+      if (i < 2) { sp_left.cp5.getController("sp_leftSP_" + i % 2).setColorBackground(#ff0000); }
+      else { sp_right.cp5.getController("sp_rightSP_" + i % 2).setColorBackground(#ff0000); }
 
       println("Connection list: spot: ", spot_ids[i].getModuleID());
     }
@@ -136,8 +137,9 @@ void checkConnection() {
           }
 
           tmrs[i] = millis();
-          if (i < 2) { cp5.get(Button.class, "sp_leftSP_" + i).setColorBackground(#00ff00); }
-          else { cp5.get(Button.class, "sp_rightSP_" + i).setColorBackground(#00ff00); }
+          println("sp_leftSP_" + str(i % 2));
+          //if (i < 2) { println(cp5.get(Button.class, "sp_leftSP_" + i % 2)); } //.setColorActive(color(#00ff00)); }//.setColorBackground(); }
+          //else { cp5.get(Button.class, "sp_rightSP_" + i % 2).setColorActive(color(#00ff00)); }
           
           //print(i);
           // for (byte x : buf) print(int(x), ' ');
