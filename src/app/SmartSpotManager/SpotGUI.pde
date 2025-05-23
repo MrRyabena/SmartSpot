@@ -446,6 +446,19 @@ public class SpotGUI {
         color col = color(H, 255, 255);
         spot.setColor(int(red(col)), int(green(col)), int(blue(col)));
       }
+      
+      if (syncing_flag) 
+      { 
+        for (SpotGUI x : syncing) 
+        {
+          for (SpotVirtual spot : x.virtual_spots) 
+          {
+             int H = int(random(0, 255));
+             color col = color(H, 255, 255);
+        spot.setColor(int(red(col)), int(green(col)), int(blue(col)));
+          }
+        }
+      }
 
       colorMode(RGB);
       

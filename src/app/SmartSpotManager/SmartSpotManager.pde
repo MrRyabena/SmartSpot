@@ -90,7 +90,7 @@ void setup() {
 
   sp_left.guiSetup();
   sp_right.guiSetup();
-  //   sp_left.cp5.getController("sp_leftbr_maxBr").setValue(210);
+  
   sp_left.cp5.getController("sp_leftbright").setValue(0);
   sp_right.cp5.getController("sp_rightbr_maxBr").setValue(210);
   sp_right.cp5.getController("sp_rightbright").setValue(0);
