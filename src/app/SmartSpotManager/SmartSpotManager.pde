@@ -126,7 +126,7 @@ void checkConnection() {
 
       for (int i = 0; i < spot_ids.length; i++)
       {
-        if (buf[5] == spot_ids[i].getModuleID())
+        if (buf.length >= 5 && buf[5] == spot_ids[i].getModuleID())
         {
           if (spots[i].spot == null)
           {
