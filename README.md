@@ -2,7 +2,7 @@
 
 ---
 
-[<img src="https://github.com/MrRyabena/SmartHomeSystem/blob/v2.0.0/SHSlogos/SVG/SHS_inscr-light_mint.svg" height="20"/>](https://github.com/MrRyabena/SmartHomeSystem)
+[<img src="https://github.com/MrRyabena/SmartHomeSystem/blob/v2.X.X/SHSlogos/SVG/SHS_inscr-light_mint.svg" width="90"/>](https://github.com/MrRyabena/SmartHomeSystem)
 [![Static Badge](https://img.shields.io/badge/Telegram-dev%20blog-blue)](https://t.me/SmartHomeSysrem)
 
 ---
