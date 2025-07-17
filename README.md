@@ -2,7 +2,7 @@
 
 ---
 
-[<img src="https://github.com/MrRyabena/SmartHomeSystem/blob/v2.X.X/SHSlogos/SVG/SHS_inscr-light_mint.svg" width="90"/>](https://github.com/MrRyabena/SmartHomeSystem)
+[<img src="https://github.com/MrRyabena/SmartHomeSystem/blob/main/SHSlogos/PNG/SHS_inscr-light_mint.png" height="20"/>](https://github.com/MrRyabena/SmartHomeSystem)
 [![Static Badge](https://img.shields.io/badge/Telegram-dev%20blog-blue)](https://t.me/SmartHomeSysrem)
 
 ---
@@ -13,6 +13,12 @@
 - Внутри кода используется ядро и библиотека основного проекта — **_[SmartHomeSystem](https://github.com/MrRyabena/SmartHomeSystem/tree/v1.2.0)_**.</br>
 - **_SmartSpot_** — первое самостоятельное устройство, интегрированное в **_SmartHomeSystem_**.
 - Для дистанционного управления написано GUI-приложение, пока что на processing (может быть будет переписано на C++ (Qt)).
+
+<img alt="spot photo" src="photo/spot_1.jpg" height="200"/>
+<img alt="spot photo" src="photo/spot_5.jpg" height="200"/>
+<img alt="spot photo" src="photo/spot_6.jpg" height="200"/>
+<img alt="spot photo" src="photo/spot_4.jpg" height="200"/>
+
 
 <a id="versions"></a>
 
