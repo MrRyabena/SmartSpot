@@ -14,10 +14,7 @@
 - **_SmartSpot_** — первое самостоятельное устройство, интегрированное в **_SmartHomeSystem_**.
 - Для дистанционного управления написано GUI-приложение, пока что на processing (может быть будет переписано на C++ (Qt)).
 
-<img alt="spot photo" src="photo/spot_1.jpg" height="200"/>
-<img alt="spot photo" src="photo/spot_5.jpg" height="200"/>
-<img alt="spot photo" src="photo/spot_6.jpg" height="200"/>
-<img alt="spot photo" src="photo/spot_4.jpg" height="200"/>
+<img alt="spot photo" src="photo/spot_1.jpg" height="200"/> <img alt="spot photo" src="photo/spot_5.jpg" height="200"/> <img alt="spot photo" src="photo/spot_6.jpg" height="200"/> <img alt="spot photo" src="photo/spot_4.jpg" height="200"/>
 
 
 <a id="versions"></a>
