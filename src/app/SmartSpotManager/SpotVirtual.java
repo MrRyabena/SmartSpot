@@ -56,11 +56,10 @@ class SpotVirtual {
 
     if (spot != null) spot.write(buf);
 
-  //for (int i = 0; i < buf.length; i++) System.out.print((int)buf[i]); System.out.println();
-
+    //for (int i = 0; i < buf.length; i++) System.out.print((int)buf[i]); System.out.println();
   }
 
-  void requestTemperature() 
+  void requestTemperature()
   {
     byte[] buf = new byte[1];
 
@@ -75,15 +74,15 @@ class SpotVirtual {
     m_send(buf, (byte) 2);
   }
 
-   void setCooling(byte val) {
+  void setCooling(byte val) {
     byte[] buf = new byte[3];
 
-   buf[0] = 2;
-   buf[1] |= val;
-   if (val != 0) buf[2] = 1;
-   else buf[2] = 0;
-   
-   m_send(buf, (byte)2);
+    buf[0] = 2;
+    buf[1] |= val;
+    if (val != 0) buf[2] = 1;
+    else buf[2] = 0;
+
+    m_send(buf, (byte)2);
   }
 
   void setBright(int val) {
@@ -110,7 +109,7 @@ class SpotVirtual {
     buf[1] |= r;
     buf[2] |= g;
     buf[3] |= b;
-    buf[4] |= 255; //(byte) power;    
+    buf[4] |= 255; //(byte) power;
 
     m_send(buf);
   }
@@ -136,163 +135,124 @@ class SpotVirtual {
     m_send(buf);
   }
 
-  // void setMusicEffect(byte mode) {
-  // byte[] buf = new byte[4];
+  void setMusicEffect(byte mode) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 2;
-  // buf[2] = 2;
-  // buf[3] |= mode;
+    buf[0] |= 2;
+    buf[1] |= mode;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    if (spot != null)
+      m_send(buf, (byte)3);
+  }
 
-  // void setDt(int val) {
-  // byte[] buf = new byte[5];
+  void setDt(int val) {
+    byte[] buf = new byte[3];
 
-  // buf[0] = 5;
-  // buf[1] = 3;
-  // buf[2] = 0;
-  // buf[3] |= val >> 8;
-  // buf[4] |= val;
+    buf[0] = 6;
+    buf[1] |= val >> 8;
+    buf[2] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setWindow(byte val) {
-  // byte[] buf = new byte[4];
+  void setWindow(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 1;
-  // buf[3] |= val;
+    buf[0] |= 7;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setTrsh(int val) {
-  // byte[] buf = new byte[5];
+  void setTrsh(int val) {
+    byte[] buf = new byte[3];
 
-  // buf[0] |= 5;
-  // buf[1] = 3;
-  // buf[2] = 2;
-  // buf[3] |= val >> 8;
-  // buf[4] |= val;
+    buf[0] = 8;
+    buf[1] |= val >> 8;
+    buf[2] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setVolDt(byte val) {
-  // byte[] buf = new byte[4];
+  void setVolDt(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 3;
-  // buf[3] |= val;
+    buf[0] = 9;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setVolK(byte val) {
-  // byte[] buf = new byte[4];
+  void setVolK(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 4;
-  // buf[3] |= val;
+    buf[0] = 10;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setVolMin(byte val) {
-  // byte[] buf = new byte[4];
+  void setVolMin(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 5;
-  // buf[3] |= val;
+    buf[0] = 11;
+    buf[1] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setVolMax(byte val) {
-  // byte[] buf = new byte[4];
+  void setVolMax(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 6;
-  // buf[3] |= val;
+    buf[0] = 12;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setAmpliDt(byte val) {
-  // byte[] buf = new byte[4];
+  void setAmpliDt(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 7;
-  // buf[3] |= val;
+    buf[0] = 13;
+    buf[1] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setAmpliK(byte val) {
-  // byte[] buf = new byte[4];
+  void setAmpliK(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 8;
-  // buf[3] |= val;
+    buf[0] = 14;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setPulseMax(byte val) {
-  // byte[] buf = new byte[4];
+  void setPulseMax(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 9;
-  // buf[3] |= val;
+    buf[0] = 15;
+    buf[1] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setPulseMin(byte val) {
-  // byte[] buf = new byte[4];
+  void setPulseMin(byte val) {
+    byte[] buf = new byte[2];
 
-  // buf[0] |= 4;
-  // buf[1] = 3;
-  // buf[2] = 10;
-  // buf[3] |= val;
+    buf[0] = 16;
+    buf[1] = val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
+    m_send(buf, (byte)3);
+  }
 
-  // void setPulseTimeout(int val) {
-  // byte[] buf = new byte[5];
+  void setPulseTimeout(int val) {
+    byte[] buf = new byte[5];
 
-  // buf[0] |= 5;
-  // buf[1] = 3;
-  // buf[2] = 11;
-  // buf[3] |= val >> 8;
-  // buf[4] |= val;
+    buf[0] |= 17;
+    buf[1] |= val >> 8;
+    buf[2] |= val;
 
-  // if (spot != null)
-  // spot.write(buf);
-  // }
-
+    m_send(buf, (byte)3);
+  }
 }
