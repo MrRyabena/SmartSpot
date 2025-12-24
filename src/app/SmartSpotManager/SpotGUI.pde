@@ -1034,7 +1034,7 @@ public class SpotGUI {
       .onClick(new CallbackListener() {
 
       public void controlEvent(CallbackEvent event) {
-        //if (spot_virtual != null) for (SpotVirtual spot : virtual_spots) spot.setMusicEffect(byte(event.getController().getValue()));
+        if (virtual_spots != null) for (SpotVirtual spot : virtual_spots) spot.setMusicEffect(byte(event.getController().getValue()));
       }
     }
     );

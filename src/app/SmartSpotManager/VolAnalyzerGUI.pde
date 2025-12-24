@@ -88,7 +88,7 @@ public class VolAnalyzerGUI
         .setId(i)
         .onChange(new CallbackListener() {
         public void controlEvent(CallbackEvent event) {
-          handleChange(event.getController().getValue(), event.getController().getId() );
+          handleChange(event.getController().getValue(), event.getController().getId());
         }
       }
       )
@@ -121,7 +121,7 @@ public class VolAnalyzerGUI
 
   float range_value[][] =
     {
-    { 0, 20000, 5000 }, // setDt
+    { 0, 20000, 20 }, // setDt
     { 0, 100, 20 }, // setWindow
     { 0, 1023, 40 }, // setTrsh
 

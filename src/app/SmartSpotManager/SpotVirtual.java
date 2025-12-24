@@ -87,6 +87,7 @@ class SpotVirtual {
 
   void setBright(int val) {
     byte buf[] = new byte[2];
+   
 
     brightness = (byte) (val < max_brightness ? val : max_brightness);
     buf[0] = 13;
@@ -137,6 +138,8 @@ class SpotVirtual {
 
   void setMusicEffect(byte mode) {
     byte[] buf = new byte[2];
+    
+    System.out.println("send music effect");
 
     buf[0] |= 2;
     buf[1] |= mode;

@@ -11,16 +11,16 @@ Server server;
 // -----------------------------------------------------------------------------
 
 shs_ID[] spot_ids = {
-  new shs_ID(11, 0, 0),              // miluta
-  new shs_ID(12, 0, 0),              // 
-  new shs_ID(14, 0, 0),              // left (new)
-  new shs_ID(15, 0, 0)               // right (old) 
-};       
+  new shs_ID(11, 0, 0), // miluta
+  new shs_ID(12, 0, 0), //
+  new shs_ID(14, 0, 0), // left (new)
+  new shs_ID(15, 0, 0)               // right (old)
+};
 
 int[][] spot_pb = {
-  {35, 255},                         // miluta
-  {35, 255},                         //
-  {35, 240},                         // left (new)
+  {35, 255}, // miluta
+  {35, 255}, //
+  {35, 240}, // left (new)
   {35, 180}                          // right (old)
 };
 
@@ -104,16 +104,16 @@ void setup() {
 
   sp_left.guiSetup();
   sp_right.guiSetup();
-  
+
   sp_left.cp5.getController("sp_leftbright").setValue(0);
   sp_right.cp5.getController("sp_rightbr_maxBr").setValue(210);
   sp_right.cp5.getController("sp_rightbright").setValue(0);
 }
 
 void s_sync(int val) {
-   sp_left.setSyncing(!boolean(val));
-   if (val == 0) cp5.get(Toggle.class, "sync").setColorActive(color(#00ff00));
-   else cp5.get(Toggle.class, "sync").setColorActive(color(#ff0000));
+  sp_left.setSyncing(!boolean(val));
+  if (val == 0) cp5.get(Toggle.class, "sync").setColorActive(color(#00ff00));
+  else cp5.get(Toggle.class, "sync").setColorActive(color(#ff0000));
 }
 long[] tmrs = new long[spot_ids.length];
 
@@ -125,21 +125,26 @@ void checkConnection() {
     if (spots[i].spot != null &&(!spots[i].spot.active() || millis() - tmrs[i] >= 20000)) {
       spots[i].spot.stop();
       spots[i].spot = null;
-      
-      if (i < 2) { sp_left.setSP(i % 2, false); }
-      else { sp_right.setSP(i % 2, false); }
+
+      if (i < 2) {
+        sp_left.setSP(i % 2, false);
+      } else {
+        sp_right.setSP(i % 2, false);
+      }
 
       println("Connection list: spot: ", spot_ids[i].getModuleID());
     }
   }
 
   if (client != null) {
-
+    //println("New Client: ", client.ip());
     if (client.available() > 0) {
       byte buf[] = client.readBytes();
 
       for (int i = 0; i < spot_ids.length; i++)
       {
+        //for (var x : buf) print(x, " ");
+        //println();
         if (buf.length >= 5 && buf[5] == spot_ids[i].getModuleID())
         {
           if (spots[i].spot == null)
@@ -152,8 +157,11 @@ void checkConnection() {
 
           tmrs[i] = millis();
 
-          if (i < 2) { sp_left.setSP(i % 2, true); } 
-          else { sp_right.setSP(i % 2, true); }
+          if (i < 2) {
+            sp_left.setSP(i % 2, true);
+          } else {
+            sp_right.setSP(i % 2, true);
+          }
 
 
 
