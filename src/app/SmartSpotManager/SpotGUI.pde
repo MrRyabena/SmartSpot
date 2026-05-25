@@ -467,6 +467,57 @@ public class SpotGUI {
   }
 
 
+boolean flag_br_br = false;
+long br_br_tmr;
+int br_br_incr = -1;
+void brightBreathing_tick()
+{
+  if (flag_br_br && millis() - br_br_tmr >= cp5.get(Slider.class, panel_name + "breath_speed").getValue())
+  {
+      var bright = cp5.get(Knob.class, panel_name + "bright").getValue();
+      
+      if (bright <= cp5.get(Slider.class, panel_name + "breath_min").getValue())
+      {
+         br_br_incr = abs(br_br_incr);
+      }
+      else if (bright >= 255) 
+      {
+        br_br_incr = -abs(br_br_incr);
+      }
+      
+      bright += br_br_incr;
+      
+      cp5.get(Knob.class, panel_name + "bright").setValue(bright);
+      br_br_tmr = millis();
+  }
+}
+
+boolean flag_random_br_br = false;
+int [][] random_br_br_values = new int[4][2];
+void randomBrightBreathing_tick()
+{
+  
+  
+}
+
+boolean flag_irish = false;
+long irish_tmr;
+color[] irish_colors = { color(#00ff00), color(#ffffff), color(#ff5A00) };
+int irish_ptr = 0;
+void irish_tick()
+{
+  if (flag_irish && millis() - irish_tmr >= cp5.get(Slider.class, panel_name + "irish_speed").getValue())
+  {
+     setColor(irish_colors[irish_ptr]);
+     if (++irish_ptr >= irish_colors.length) irish_ptr = 0;
+     irish_tmr = millis();
+  }
+  
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------
+
   void handle_fan_toggle(CallbackEvent event)
   {
     int val = int(event.getController().getValue());
@@ -490,6 +541,8 @@ public class SpotGUI {
     fire_tick();
     info_tick();
     RandomColor_tick();
+    brightBreathing_tick();
+    irish_tick();
   }
 
   /*
@@ -915,6 +968,135 @@ public class SpotGUI {
     }
     )
     ;
+    
+    
+    
+       cp5
+      .addToggle(panel_name + "Breathing")
+      .setCaptionLabel("Breathing")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(480 + shift_x, 570 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        flag_br_br = !flag_br_br;
+        if (flag_br_br) {
+           cp5.get(Toggle.class, panel_name + "Breathing").setColorActive(color(#00ff00)); 
+        } else {
+          cp5.get(Toggle.class, panel_name + "Breathing").setColorActive(color(#ff0000));
+        }
+      }
+    }
+    )
+    ;
+    
+    //   cp5
+    //  .addToggle(panel_name + "RandomBreathing")
+    //  .setCaptionLabel("RandomBreathing")
+    //  .setValue(false)
+    //  .setMode(ControlP5.SWITCH)
+    //  .setPosition(480 + shift_x, 650 + shift_y)
+    //  .setSize(80, 30)
+    //  .setColorActive(color(#ff0000))
+    //  .onClick(new CallbackListener() {
+    //  public void controlEvent(CallbackEvent event) {
+    //    flag_random_br_br = !flag_random_br_br;
+    //    if (flag_br_br) {
+    //       cp5.get(Toggle.class, panel_name + "RandomBreathing").setColorActive(color(#00ff00)); 
+    //    } else {
+    //      cp5.get(Toggle.class, panel_name + "RandomBreathing").setColorActive(color(#ff0000));
+    //    }
+    //  }
+    //}
+    //)
+    //;
+
+    cp5
+      .addSlider(panel_name + "breath_speed")
+      .setCaptionLabel("breath speed")
+      .setPosition(480 + shift_x, 620 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 100)
+      .setValue(50)
+      ;
+      
+      cp5
+      .addSlider(panel_name + "breath_step")
+      .setCaptionLabel("breath step")
+      .setPosition(480 + shift_x, 670 + shift_y)
+      .setSize(300, 30)
+      .setRange(1, 20)
+      .setValue(1)
+      .onChange(new CallbackListener() {
+           public void controlEvent(CallbackEvent event) {
+          int val = int(event.getController().getValue());
+          br_br_incr = br_br_incr < 0 ? -val : val;
+        }})
+      ;
+      
+     
+      cp5
+      .addSlider(panel_name + "breath_min")
+      .setCaptionLabel("breath min")
+      .setPosition(480 + shift_x, 720 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 255)
+      .setValue(0)
+      ;
+      
+      
+        
+      cp5
+      .addToggle(panel_name + "Irish")
+      .setCaptionLabel("Irish")
+      .setValue(false)
+      .setMode(ControlP5.SWITCH)
+      .setPosition(480 + shift_x, 770 + shift_y)
+      .setSize(80, 30)
+      .setColorActive(color(#ff0000))
+      .onClick(new CallbackListener() {
+      public void controlEvent(CallbackEvent event) {
+        flag_irish = !flag_irish;
+        irish_ptr = 0;
+        if (flag_irish) {
+           cp5.get(Toggle.class, panel_name + "Irish").setColorActive(color(#00ff00)); 
+        } else {
+          cp5.get(Toggle.class, panel_name + "Irish").setColorActive(color(#ff0000));
+        }
+      }
+    }
+    )
+    ;
+
+    cp5
+      .addSlider(panel_name + "irish_speed")
+      .setCaptionLabel("speed")
+      .setPosition(480 + shift_x, 820 + shift_y)
+      .setSize(300, 30)
+      .setRange(0, 5000)
+      .setValue(500)
+      ;
+      
+    
+    //cp5
+    //  .addToggle(panel_name + "red_strob")
+    //  .setCaptionLabel("Red Strob")
+    //  .setValue(false)
+    //  .setMode(ControlP5.SWITCH)
+    //  .setPosition(480 + shift_x, 770 + shift_y)
+    //  .setSize(80, 30)
+    //  .setColorActive(color(#ff0000))
+    //  .onClick(new CallbackListener() {
+    //  public void controlEvent(CallbackEvent event) {
+    //    cp5.get(Togle.class, panel_name + 
+    //  }
+    //}
+    //)
+    //;
+
+
   }
 
   //color guiColors[] ={color(40), // background
@@ -1018,25 +1200,25 @@ public class SpotGUI {
       .lock()
       ;
 
-    cp5
-      .addDropdownList(panel_name + "RGBmusic")
-      .setPosition(480 + shift_x, 560 + shift_y)
-      .setSize(150, 500)
-      .setItemHeight(30)
-      .setBarHeight(30)
-      .addItem("OFF", 0)
-      .addItem("SHIFT_151", 1)
-      .addItem("SHIFT_129", 2)
-      .addItem("PULSE_WHEEL", 3)
-      .addItem("FIRE", 4)
-      .setValue(0)
-      .setOpen(false)
-      .onClick(new CallbackListener() {
+    //cp5
+    //  .addDropdownList(panel_name + "RGBmusic")
+    //  .setPosition(480 + shift_x, 560 + shift_y)
+    //  .setSize(150, 500)
+    //  .setItemHeight(30)
+    //  .setBarHeight(30)
+    //  .addItem("OFF", 0)
+    //  .addItem("SHIFT_151", 1)
+    //  .addItem("SHIFT_129", 2)
+    //  .addItem("PULSE_WHEEL", 3)
+    //  .addItem("FIRE", 4)
+    //  .setValue(0)
+    //  .setOpen(false)
+    //  .onClick(new CallbackListener() {
 
-      public void controlEvent(CallbackEvent event) {
-        if (virtual_spots != null) for (SpotVirtual spot : virtual_spots) spot.setMusicEffect(byte(event.getController().getValue()));
-      }
-    }
-    );
+    //  public void controlEvent(CallbackEvent event) {
+    //    if (virtual_spots != null) for (SpotVirtual spot : virtual_spots) spot.setMusicEffect(byte(event.getController().getValue()));
+    //  }
+    //}
+    //);
   }
 }

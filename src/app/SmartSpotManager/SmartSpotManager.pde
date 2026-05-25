@@ -28,7 +28,7 @@ int[][] spot_pb = {
 SpotVirtual[] spots;
 
 SpotGUI sp_left, sp_right;
-VolAnalyzerGUI music_left;
+//VolAnalyzerGUI music_left;
 
 color[] guiColors = { color(40), // background
   color(80), // ColorBackground
@@ -89,8 +89,8 @@ void setup() {
 
   sp_left = new SpotGUI(this, 0, 0, "sp_left");
   sp_right = new SpotGUI(this, 900, 0, "sp_right");
-  music_left = new VolAnalyzerGUI(this, cp5, "music_1", 475, 600, spots[0]);
-  music_left.spots = spots;
+  //music_left = new VolAnalyzerGUI(this, cp5, "music_1", 475, 600, spots[0]);
+  //music_left.spots = spots;
 
   sp_left.virtual_spots = new SpotVirtual[2];
   for (int i = 0; i < 2; i++) sp_left.virtual_spots[i] = spots[i];
