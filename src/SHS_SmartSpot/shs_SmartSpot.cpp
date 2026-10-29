@@ -1,5 +1,7 @@
 #include "shs_SmartSpot.h"
 
+#ifdef SHS_SF_ESP
+
 #include <shs_debug.h>
 #include <shs_algorithm.h>
 
@@ -101,3 +103,5 @@ void shs::SmartSpot::m_temperatureControl()
         if (!m_fan_mode) if (m_fan) m_fan->on(fan_power);
     }
 }
+
+#endif  // #ifdef SHS_SF_ESP

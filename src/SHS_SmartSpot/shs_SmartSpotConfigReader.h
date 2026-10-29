@@ -1,5 +1,9 @@
 #pragma once
 
+#include <shs_settings_private.h>
+
+#ifdef SHS_SF_ESP
+
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <memory>
@@ -30,3 +34,5 @@ public:
 protected:
     static void m_checkAndCreateDirectory(const shs::t::shs_string_t& dir_name);
 };
+
+#endif  // #ifdef SHS_SF_ESP

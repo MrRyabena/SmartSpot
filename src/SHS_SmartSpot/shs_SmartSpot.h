@@ -1,5 +1,9 @@
 #pragma once
 
+#include <shs_settings_private.h>
+
+#ifdef SHS_SF_ESP
+
 
 #include <memory>
 #include <cassert>
@@ -94,3 +98,5 @@ protected:
 
     void m_temperatureControl();
 };
+
+#endif  // #ifdef SHS_SF_ESP

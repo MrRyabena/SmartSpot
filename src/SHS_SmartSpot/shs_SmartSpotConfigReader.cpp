@@ -1,5 +1,7 @@
 #include "shs_SmartSpotConfigReader.h"
 
+#ifdef SHS_SF_ESP
+
 bool shs::SmartSpotConfigReader::initFS()
 {
     return LittleFS.begin(true);
@@ -60,3 +62,4 @@ void shs::SmartSpotConfigReader::m_checkAndCreateDirectory(const shs::t::shs_str
     }
 }
 
+#endif  // #ifdef SHS_SF_ESP
