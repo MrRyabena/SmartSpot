@@ -6,15 +6,15 @@
 
 #include <Arduino.h>
 
-#include <GRGB.h>
-
-#include <shs_Process.h>
 
 #include <shs_lib_SensorTypes.h>
 #include <shs_lib_Thermistor.h>
 #include <shs_lib_DS18.h>
+#include <shs_lib_RgbDriver.h>
+#include <shs_lib_Color_RgbManager.h>
 
 
+#include <shs_Process.h>
 #include <shs_Load.h>
 #include <shs_LoadPWM.h>
 #include <shs_ProgramTimer.h>
@@ -22,11 +22,12 @@
 #include <shs_utils.h>
 
 #include <shs_version.h>
-static_assert(shs::version::project >= "v2.1.0");
+// static_assert(shs::version::project >= "v2.5.0");
 
 #include <shs_settings_private.h>
 
 #include "shs_SmartSpotConfig.h"
+#include "shs_SmartSpotInterface.h"
 
 namespace shs
 {
@@ -34,12 +35,11 @@ namespace shs
 }
 
 
-class shs::SmartSpot : public shs::Process
+class shs::SmartSpot : public shs::Process, public shs::SmartSpotInterface
 {
 public:
     SmartSpot(const shs::SmartSpotConfig& config);
-    SmartSpot(std::shared_ptr<GRGB> grgb, std::shared_ptr<shs::Sensor> temp_sensor, std::shared_ptr<shs::Load> fan);
-
+    SmartSpot(std::shared_ptr<shs::lib::Color::RgbDriver> chip, std::shared_ptr<shs::Sensor> temp_sensor, std::shared_ptr<shs::Load> fan);
 
     ~SmartSpot() override = default;
 
@@ -47,18 +47,17 @@ public:
     void tick() override;
     void stop() override;
 
-    std::shared_ptr<GRGB> getGRGB() { return m_chip; }
-
-    uint8_t getTemperature();
-    uint8_t getSensorStatus();
-    uint8_t getFanPower();
-    void setFan(uint8_t value, uint8_t mode = 0);
-
+    [[nodiscard]] std::shared_ptr<shs::lib::Color::RgbManager> getManager() override { return m_manager; }
+    [[nodiscard]] std::shared_ptr<shs::Sensor> getTemperatureSensor() override { return m_temp_sensor; }
+    [[nodiscard]] uint8_t getFanPower() override;
+    [[nodiscard]] uint8_t getFanMode() override { return m_fan_mode; }
+    void setFan(uint8_t value, uint8_t mode = 0) override;
 
 protected:
     static constexpr auto m_CONTROL_TIMEOUT = 2000;
 
-    std::shared_ptr<GRGB> m_chip;
+    std::shared_ptr<shs::lib::Color::RgbDriver> m_chip;
+    std::shared_ptr<shs::lib::Color::RgbManager> m_manager;
     std::shared_ptr<shs::Sensor> m_temp_sensor;
     std::shared_ptr<shs::Load> m_fan;
 
@@ -89,7 +88,7 @@ protected:
     }
     const m_config
         ;
-    
+
     uint8_t m_fan_mode{};
 
 

@@ -1,9 +1,12 @@
 #include "shs_SmartSpot.h"
 
+#include <shs_debug.h>
+#include <shs_algorithm.h>
 
 shs::SmartSpot::SmartSpot(const shs::SmartSpotConfig& config)
     : m_config(config),
-    m_chip(std::make_shared<GRGB>(COMMON_CATHODE, config.RED_PIN, config.GREEN_PIN, config.BLUE_PIN)),
+    m_chip(std::make_shared<shs::lib::Color::RgbDriver>(config.RED_PIN, config.GREEN_PIN, config.BLUE_PIN, shs::lib::Color::RgbDriver::LedType::COMMON_CATHODE)),
+    m_manager(std::make_shared<shs::lib::Color::RgbManager>(m_chip)),
     m_temp_sensor(nullptr),
     m_fan(std::make_shared<shs::LoadPWM>(config.FAN_PIN)),
     m_timer(m_CONTROL_TIMEOUT)
@@ -32,8 +35,11 @@ shs::SmartSpot::SmartSpot(const shs::SmartSpotConfig& config)
 }
 
 
-shs::SmartSpot::SmartSpot(std::shared_ptr<GRGB> grgb, std::shared_ptr<shs::Sensor> temp_sensor, std::shared_ptr<shs::Load> fan)
-    : m_chip(grgb), m_temp_sensor(temp_sensor), m_fan(fan), m_timer(m_CONTROL_TIMEOUT)
+
+shs::SmartSpot::SmartSpot(std::shared_ptr<shs::lib::Color::RgbDriver> chip, std::shared_ptr<shs::Sensor> temp_sensor, std::shared_ptr<shs::Load> fan)
+    : m_chip(chip),
+    m_manager(std::make_shared<shs::lib::Color::RgbManager>(chip)),
+    m_temp_sensor(temp_sensor), m_fan(fan), m_timer(m_CONTROL_TIMEOUT)
 {}
 
 
@@ -43,45 +49,24 @@ void shs::SmartSpot::start()
 
     if (m_chip)
     {
+    #ifndef SHS_SF_ESP32
+        m_chip->setup();
+    #endif
         m_chip->setBrightness(0);
-        m_chip->setColor(0);
+        m_chip->setColor(shs::lib::Color::RGB888{});
     }
 }
 
 
 void shs::SmartSpot::tick()
 {
-    if (m_chip) m_chip->tick();
+    if (m_manager) m_manager->tick();
     m_temperatureControl();
 }
 
 
 void shs::SmartSpot::stop()
 {}
-
-#define SHS_SF_DEBUG
-#define DEBUG
-#include <shs_debug.h>
-
-uint8_t shs::SmartSpot::getTemperature()
-{
-    if (m_temp_sensor)
-    {
-
-        doutln(m_temp_sensor->getValueF());
-        doutln(m_temp_sensor->getStatus());
-
-        return static_cast< uint8_t >(m_temp_sensor->getValueF());
-
-    }
-    return 255;
-}
-
-uint8_t shs::SmartSpot::getSensorStatus()
-{
-    if (m_temp_sensor) return m_temp_sensor->getStatus();
-    return  254;
-}
 
 uint8_t shs::SmartSpot::getFanPower()
 {
@@ -103,14 +88,14 @@ void shs::SmartSpot::m_temperatureControl()
     if (m_timer.check())
     {
 
-        auto fan_power = 255;
+        uint8_t fan_power{ 255 };
         if (m_temp_sensor)
         {
-           // m_temp_sensor->updateFast();
+            auto temp = m_temp_sensor->getValueI();
+            if (temp < 15 || temp > 100) return;  // invalid temperature reading, skip control
 
-            // fan_power = map(m_temp_sensor->getValueI(), m_config.MIN_TEMP, m_config.MAX_TEMP, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
-            // fan_power = constrain(fan_power, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
-            fan_power = (m_temp_sensor->getValueI() >= m_config.MIN_TEMP ? 255 : 0);
+            fan_power = shs::map(static_cast< uint8_t >(temp), m_config.MIN_TEMP, m_config.MAX_TEMP, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
+            fan_power = shs::clamp(fan_power, m_config.MIN_FAN_POWER, m_config.MAX_FAN_POWER);
         }
 
         if (!m_fan_mode) if (m_fan) m_fan->on(fan_power);
